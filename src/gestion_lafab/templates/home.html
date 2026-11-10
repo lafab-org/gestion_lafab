@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion La Fabrique</title>
+  <script type="module" src="/static/datastar.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    .ok { color: #1a7f37; }
+    .error { color: #cf222e; }
+  </style>
+</head>
+<body data-signals="{checking: true}">
+  <h1>Gestion La Fabrique</h1>
+  <div data-init="@get('/connexion')">
+    {{ status | safe }}
+  </div>
+  <button data-attr:disabled="$checking" data-on:click="@get('/connexion')" disabled>Tester à nouveau</button>
+</body>
+</html>
