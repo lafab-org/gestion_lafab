@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page des initiations — maquette</title>
+<style>
+:root {
+  --text: #0b0b0b; --muted: #52514e; --surface: #fcfcfb; --frame: #d9d8d4;
+  --grid: #e6e5e1; --bois: #8b5a2b; --metal: #4682b4; --souple: #8e5cc4; --numerique: #d4a017;
+  --error: #cf222e; --tip-bg: #0b0b0b; --tip-text: #fcfcfb;
+}
+body { font-family: system-ui, sans-serif; color: var(--text); background: #f0efec; margin: 0; padding: 1rem; }
+.state { font: 600 0.8rem system-ui; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 2rem auto .5rem; max-width: 60rem; }
+.frame { background: var(--surface); border: 1px solid var(--frame); border-radius: 8px; max-width: 60rem; margin: 0 auto; padding: 1rem 1.5rem 2rem; box-sizing: border-box; }
+.frame h2 { display: inline; margin-right: 1rem; }
+.read { color: var(--muted); } .error { color: var(--error); }
+h3 { font-size: 1rem; margin: 2rem 0 .5rem; }
+svg { width: 100%; height: auto; display: block; }
+.grid { stroke: var(--grid); stroke-width: 1; }
+.tick { fill: var(--muted); font-size: 11px; }
+.value { fill: var(--muted); font-size: 11px; }
+.seg { stroke: var(--surface); stroke-width: 1; }
+.seg.bois { fill: var(--bois); } .seg.metal { fill: var(--metal); } .seg.souple { fill: var(--souple); } .seg.numerique { fill: var(--numerique); }
+.partial .seg { fill-opacity: .45; }
+.partial-frame { fill: none; stroke: var(--muted); stroke-dasharray: 4 3; }
+.tip rect { fill: var(--tip-bg); } .tip text { fill: var(--tip-text); font-size: 12px; }
+.hl { stroke: var(--text); stroke-width: 2; }
+.legend { font-size: .85rem; color: var(--muted); display: flex; gap: .25rem; align-items: center; flex-wrap: wrap; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-left: .75rem; }
+.sw.bois { background: var(--bois); } .sw.metal { background: var(--metal); } .sw.souple { background: var(--souple); } .sw.numerique { background: var(--numerique); }
+.tablewrap { overflow-x: auto; max-height: 24rem; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .9rem; }
+th, td { padding: .3rem .5rem; text-align: right; border-bottom: 1px solid var(--grid); }
+thead th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
+tbody th, thead th:first-child { text-align: left; font-weight: 400; }
+td.total { font-weight: 600; }
+button { margin: .5rem 0; }
+</style>
+</head>
+<body>
+<p class="state">Données lues — survol d'un segment du graphique mensuel montré</p>
+<div class="frame">
+<h2>Initiations</h2><a href="#">Accueil</a>
+<p class="read">Données Paheko lues le 10/11/2026 à 14 h 32.</p>
+<button>Actualiser</button>
+<h3>Initiations par mois en 2026</h3>
+<div class="legend"><span class="sw bois"></span>bois<span class="sw metal"></span>métal<span class="sw souple"></span>souple<span class="sw numerique"></span>numérique</div>
+<svg viewBox="0 0 720 260" role="img" aria-label="Initiations par mois et par catégorie en 2026">
+<line class="grid" x1="44" x2="704" y1="232.0" y2="232.0"/><text class="tick" x="38" y="236.0" text-anchor="end">0</text>
+<line class="grid" x1="44" x2="704" y1="160.0" y2="160.0"/><text class="tick" x="38" y="164.0" text-anchor="end">10</text>
+<line class="grid" x1="44" x2="704" y1="88.0" y2="88.0"/><text class="tick" x="38" y="92.0" text-anchor="end">20</text>
+<line class="grid" x1="44" x2="704" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">30</text>
+<text class="tick" x="71.5" y="250" text-anchor="middle">Janv.</text>
+<rect class="seg bois" x="52.2" y="203.2" width="38.5" height="28.8"><title>bois, janvier 2026 : 4</title></rect>
+<rect class="seg metal" x="52.2" y="152.8" width="38.5" height="50.4"><title>métal, janvier 2026 : 7</title></rect>
+<rect class="seg souple" x="52.2" y="145.6" width="38.5" height="7.2"><title>souple, janvier 2026 : 1</title></rect>
+<rect class="seg numerique" x="52.2" y="116.8" width="38.5" height="28.8"><title>numérique, janvier 2026 : 4</title></rect>
+<text class="value" x="71.5" y="111.8" text-anchor="middle">16</text>
+<text class="tick" x="126.5" y="250" text-anchor="middle">Févr.</text>
+<rect class="seg bois" x="107.2" y="152.8" width="38.5" height="79.2"><title>bois, février 2026 : 11</title></rect>
+<rect class="seg metal" x="107.2" y="88.0" width="38.5" height="64.8"><title>métal, février 2026 : 9</title></rect>
+<rect class="seg numerique" x="107.2" y="30.4" width="38.5" height="57.6"><title>numérique, février 2026 : 8</title></rect>
+<text class="value" x="126.5" y="25.4" text-anchor="middle">28</text>
+<text class="tick" x="181.5" y="250" text-anchor="middle">Mars</text>
+<rect class="seg metal" x="162.2" y="181.6" width="38.5" height="50.4"><title>métal, mars 2026 : 7</title></rect>
+<rect class="seg numerique" x="162.2" y="167.2" width="38.5" height="14.4"><title>numérique, mars 2026 : 2</title></rect>
+<text class="value" x="181.5" y="162.2" text-anchor="middle">9</text>
+<text class="tick" x="236.5" y="250" text-anchor="middle">Avr.</text>
+<rect class="seg bois" x="217.2" y="152.8" width="38.5" height="79.2"><title>bois, avril 2026 : 11</title></rect>
+<rect class="seg metal" x="217.2" y="95.2" width="38.5" height="57.6"><title>métal, avril 2026 : 8</title></rect>
+<rect class="seg souple" x="217.2" y="59.2" width="38.5" height="36.0"><title>souple, avril 2026 : 5</title></rect>
+<text class="value" x="236.5" y="54.2" text-anchor="middle">24</text>
+<text class="tick" x="291.5" y="250" text-anchor="middle">Mai</text>
+<rect class="seg bois" x="272.2" y="196.0" width="38.5" height="36.0"><title>bois, mai 2026 : 5</title></rect>
+<rect class="seg metal" x="272.2" y="152.8" width="38.5" height="43.2"><title>métal, mai 2026 : 6</title></rect>
+<rect class="seg numerique" x="272.2" y="95.2" width="38.5" height="57.6"><title>numérique, mai 2026 : 8</title></rect>
+<text class="value" x="291.5" y="90.2" text-anchor="middle">19</text>
+<text class="tick" x="346.5" y="250" text-anchor="middle">Juin</text>
+<rect class="seg bois" x="327.2" y="217.6" width="38.5" height="14.4"><title>bois, juin 2026 : 2</title></rect>
+<rect class="seg metal" x="327.2" y="188.8" width="38.5" height="28.8"><title>métal, juin 2026 : 4</title></rect>
+<rect class="seg numerique" x="327.2" y="73.6" width="38.5" height="115.2"><title>numérique, juin 2026 : 16</title></rect>
+<text class="value" x="346.5" y="68.6" text-anchor="middle">22</text>
+<text class="tick" x="401.5" y="250" text-anchor="middle">Juil.</text>
+<rect class="seg metal" x="382.2" y="224.8" width="38.5" height="7.2"><title>métal, juillet 2026 : 1</title></rect>
+<rect class="seg numerique" x="382.2" y="217.6" width="38.5" height="7.2"><title>numérique, juillet 2026 : 1</title></rect>
+<text class="value" x="401.5" y="212.6" text-anchor="middle">2</text>
+<text class="tick" x="456.5" y="250" text-anchor="middle">Août</text>
+<text class="value" x="456.5" y="227.0" text-anchor="middle">0</text>
+<text class="tick" x="511.5" y="250" text-anchor="middle">Sept.</text>
+<text class="value" x="511.5" y="227.0" text-anchor="middle">0</text>
+<text class="tick" x="566.5" y="250" text-anchor="middle">Oct.</text>
+<rect class="seg numerique" x="547.2" y="196.0" width="38.5" height="36.0"><title>numérique, octobre 2026 : 5</title></rect>
+<text class="value" x="566.5" y="191.0" text-anchor="middle">5</text>
+<text class="tick" x="621.5" y="250" text-anchor="middle">Nov.</text>
+<text class="value" x="621.5" y="227.0" text-anchor="middle">0</text>
+<text class="tick" x="676.5" y="250" text-anchor="middle">Déc.</text>
+<g class="tip"><rect class="seg numerique hl" x="327.2" y="73.6" width="38.5" height="115.2"/><rect x="373.8" y="73.6" width="150" height="28" rx="4"/><text x="448.8" y="92.6" text-anchor="middle">numérique, juin 2026 : 16</text></g>
+</svg>
+<h3>Total annuel</h3>
+<div class="legend"><span class="sw bois"></span>bois<span class="sw metal"></span>métal<span class="sw souple"></span>souple<span class="sw numerique"></span>numérique</div>
+<svg viewBox="0 0 720 240" role="img" aria-label="Initiations par année et par catégorie">
+<line class="grid" x1="44" x2="704" y1="212.0" y2="212.0"/><text class="tick" x="38" y="216.0" text-anchor="end">0</text>
+<line class="grid" x1="44" x2="704" y1="172.8" y2="172.8"/><text class="tick" x="38" y="176.8" text-anchor="end">50</text>
+<line class="grid" x1="44" x2="704" y1="133.6" y2="133.6"/><text class="tick" x="38" y="137.6" text-anchor="end">100</text>
+<line class="grid" x1="44" x2="704" y1="94.4" y2="94.4"/><text class="tick" x="38" y="98.4" text-anchor="end">150</text>
+<line class="grid" x1="44" x2="704" y1="55.2" y2="55.2"/><text class="tick" x="38" y="59.2" text-anchor="end">200</text>
+<line class="grid" x1="44" x2="704" y1="16.0" y2="16.0"/><text class="tick" x="38" y="20.0" text-anchor="end">250</text>
+<text class="tick" x="85.2" y="230" text-anchor="middle">2019</text>
+<rect class="seg numerique" x="56.4" y="208.9" width="57.7" height="3.1"><title>numérique, 2019 : 4</title></rect>
+<text class="value" x="85.2" y="203.9" text-anchor="middle">4</text>
+<text class="tick" x="167.8" y="230" text-anchor="middle">2020</text>
+<rect class="seg numerique" x="138.9" y="181.4" width="57.7" height="30.6"><title>numérique, 2020 : 39</title></rect>
+<text class="value" x="167.8" y="176.4" text-anchor="middle">39</text>
+<text class="tick" x="250.2" y="230" text-anchor="middle">2021</text>
+<rect class="seg numerique" x="221.4" y="193.2" width="57.7" height="18.8"><title>numérique, 2021 : 24</title></rect>
+<text class="value" x="250.2" y="188.2" text-anchor="middle">24</text>
+<text class="tick" x="332.8" y="230" text-anchor="middle">2022</text>
+<rect class="seg numerique" x="303.9" y="197.9" width="57.7" height="14.1"><title>numérique, 2022 : 18</title></rect>
+<text class="value" x="332.8" y="192.9" text-anchor="middle">18</text>
+<text class="tick" x="415.2" y="230" text-anchor="middle">2023</text>
+<rect class="seg bois" x="386.4" y="115.6" width="57.7" height="96.4"><title>bois, 2023 : 123</title></rect>
+<rect class="seg metal" x="386.4" y="81.1" width="57.7" height="34.5"><title>métal, 2023 : 44</title></rect>
+<rect class="seg souple" x="386.4" y="79.5" width="57.7" height="1.6"><title>souple, 2023 : 2</title></rect>
+<rect class="seg numerique" x="386.4" y="41.1" width="57.7" height="38.4"><title>numérique, 2023 : 49</title></rect>
+<text class="value" x="415.2" y="36.1" text-anchor="middle">218</text>
+<text class="tick" x="497.8" y="230" text-anchor="middle">2024</text>
+<rect class="seg bois" x="468.9" y="157.9" width="57.7" height="54.1"><title>bois, 2024 : 69</title></rect>
+<rect class="seg metal" x="468.9" y="124.2" width="57.7" height="33.7"><title>métal, 2024 : 43</title></rect>
+<rect class="seg numerique" x="468.9" y="100.7" width="57.7" height="23.5"><title>numérique, 2024 : 30</title></rect>
+<text class="value" x="497.8" y="95.7" text-anchor="middle">142</text>
+<text class="tick" x="580.2" y="230" text-anchor="middle">2025</text>
+<rect class="seg bois" x="551.4" y="154.8" width="57.7" height="57.2"><title>bois, 2025 : 73</title></rect>
+<rect class="seg metal" x="551.4" y="99.9" width="57.7" height="54.9"><title>métal, 2025 : 70</title></rect>
+<rect class="seg souple" x="551.4" y="93.6" width="57.7" height="6.3"><title>souple, 2025 : 8</title></rect>
+<rect class="seg numerique" x="551.4" y="70.1" width="57.7" height="23.5"><title>numérique, 2025 : 30</title></rect>
+<text class="value" x="580.2" y="65.1" text-anchor="middle">181</text>
+<text class="tick" x="662.8" y="230" text-anchor="middle">2026</text>
+<g class="partial"><rect class="seg bois" x="633.9" y="186.1" width="57.7" height="25.9"><title>bois, 2026 : 33</title></rect><rect class="seg metal" x="633.9" y="153.2" width="57.7" height="32.9"><title>métal, 2026 : 42</title></rect><rect class="seg souple" x="633.9" y="148.5" width="57.7" height="4.7"><title>souple, 2026 : 6</title></rect><rect class="seg numerique" x="633.9" y="114.0" width="57.7" height="34.5"><title>numérique, 2026 : 44</title></rect></g>
+<rect class="partial-frame" x="633.9" y="114.0" width="57.7" height="98.0"/>
+<text class="tick" x="662.8" y="96.0" text-anchor="middle">en cours</text>
+<text class="value" x="662.8" y="109.0" text-anchor="middle">125</text>
+</svg>
+<h3>Initiations par mois</h3>
+<div class="tablewrap"><table><thead><tr><th>Mois</th><th>bois</th><th>métal</th><th>souple</th><th>numérique</th><th>Total</th></tr></thead><tbody>
+<tr><th>novembre 2026</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>octobre 2026</th><td>0</td><td>0</td><td>0</td><td>5</td><td class="total">5</td></tr>
+<tr><th>septembre 2026</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>août 2026</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2026</th><td>0</td><td>1</td><td>0</td><td>1</td><td class="total">2</td></tr>
+<tr><th>juin 2026</th><td>2</td><td>4</td><td>0</td><td>16</td><td class="total">22</td></tr>
+<tr><th>mai 2026</th><td>5</td><td>6</td><td>0</td><td>8</td><td class="total">19</td></tr>
+<tr><th>avril 2026</th><td>11</td><td>8</td><td>5</td><td>0</td><td class="total">24</td></tr>
+<tr><th>mars 2026</th><td>0</td><td>7</td><td>0</td><td>2</td><td class="total">9</td></tr>
+<tr><th>février 2026</th><td>11</td><td>9</td><td>0</td><td>8</td><td class="total">28</td></tr>
+<tr><th>janvier 2026</th><td>4</td><td>7</td><td>1</td><td>4</td><td class="total">16</td></tr>
+<tr><th>décembre 2025</th><td>3</td><td>3</td><td>0</td><td>0</td><td class="total">6</td></tr>
+<tr><th>novembre 2025</th><td>7</td><td>8</td><td>0</td><td>11</td><td class="total">26</td></tr>
+<tr><th>octobre 2025</th><td>2</td><td>16</td><td>2</td><td>1</td><td class="total">21</td></tr>
+<tr><th>septembre 2025</th><td>12</td><td>8</td><td>5</td><td>6</td><td class="total">31</td></tr>
+<tr><th>août 2025</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2025</th><td>0</td><td>3</td><td>0</td><td>0</td><td class="total">3</td></tr>
+<tr><th>juin 2025</th><td>10</td><td>4</td><td>0</td><td>1</td><td class="total">15</td></tr>
+<tr><th>mai 2025</th><td>3</td><td>1</td><td>0</td><td>0</td><td class="total">4</td></tr>
+<tr><th>avril 2025</th><td>9</td><td>3</td><td>0</td><td>1</td><td class="total">13</td></tr>
+<tr><th>mars 2025</th><td>15</td><td>9</td><td>1</td><td>6</td><td class="total">31</td></tr>
+<tr><th>février 2025</th><td>5</td><td>8</td><td>0</td><td>4</td><td class="total">17</td></tr>
+<tr><th>janvier 2025</th><td>7</td><td>7</td><td>0</td><td>0</td><td class="total">14</td></tr>
+<tr><th>décembre 2024</th><td>3</td><td>2</td><td>0</td><td>0</td><td class="total">5</td></tr>
+<tr><th>novembre 2024</th><td>7</td><td>0</td><td>0</td><td>2</td><td class="total">9</td></tr>
+<tr><th>octobre 2024</th><td>3</td><td>3</td><td>0</td><td>6</td><td class="total">12</td></tr>
+<tr><th>septembre 2024</th><td>10</td><td>3</td><td>0</td><td>3</td><td class="total">16</td></tr>
+<tr><th>août 2024</th><td>0</td><td>4</td><td>0</td><td>0</td><td class="total">4</td></tr>
+<tr><th>juillet 2024</th><td>2</td><td>4</td><td>0</td><td>7</td><td class="total">13</td></tr>
+<tr><th>juin 2024</th><td>7</td><td>4</td><td>0</td><td>0</td><td class="total">11</td></tr>
+<tr><th>mai 2024</th><td>5</td><td>2</td><td>0</td><td>0</td><td class="total">7</td></tr>
+<tr><th>avril 2024</th><td>9</td><td>8</td><td>0</td><td>3</td><td class="total">20</td></tr>
+<tr><th>mars 2024</th><td>10</td><td>4</td><td>0</td><td>3</td><td class="total">17</td></tr>
+<tr><th>février 2024</th><td>6</td><td>7</td><td>0</td><td>4</td><td class="total">17</td></tr>
+<tr><th>janvier 2024</th><td>7</td><td>2</td><td>0</td><td>2</td><td class="total">11</td></tr>
+<tr><th>décembre 2023</th><td>0</td><td>3</td><td>0</td><td>8</td><td class="total">11</td></tr>
+<tr><th>novembre 2023</th><td>16</td><td>6</td><td>0</td><td>12</td><td class="total">34</td></tr>
+<tr><th>octobre 2023</th><td>10</td><td>4</td><td>1</td><td>1</td><td class="total">16</td></tr>
+<tr><th>septembre 2023</th><td>2</td><td>1</td><td>0</td><td>5</td><td class="total">8</td></tr>
+<tr><th>août 2023</th><td>6</td><td>1</td><td>0</td><td>2</td><td class="total">9</td></tr>
+<tr><th>juillet 2023</th><td>5</td><td>0</td><td>0</td><td>2</td><td class="total">7</td></tr>
+<tr><th>juin 2023</th><td>6</td><td>5</td><td>0</td><td>3</td><td class="total">14</td></tr>
+<tr><th>mai 2023</th><td>15</td><td>5</td><td>0</td><td>6</td><td class="total">26</td></tr>
+<tr><th>avril 2023</th><td>2</td><td>2</td><td>0</td><td>1</td><td class="total">5</td></tr>
+<tr><th>mars 2023</th><td>6</td><td>6</td><td>1</td><td>1</td><td class="total">14</td></tr>
+<tr><th>février 2023</th><td>21</td><td>7</td><td>0</td><td>5</td><td class="total">33</td></tr>
+<tr><th>janvier 2023</th><td>34</td><td>4</td><td>0</td><td>3</td><td class="total">41</td></tr>
+<tr><th>décembre 2022</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>novembre 2022</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>octobre 2022</th><td>0</td><td>0</td><td>0</td><td>2</td><td class="total">2</td></tr>
+<tr><th>septembre 2022</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>août 2022</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2022</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juin 2022</th><td>0</td><td>0</td><td>0</td><td>2</td><td class="total">2</td></tr>
+<tr><th>mai 2022</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>avril 2022</th><td>0</td><td>0</td><td>0</td><td>2</td><td class="total">2</td></tr>
+<tr><th>mars 2022</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>février 2022</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>janvier 2022</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>décembre 2021</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>novembre 2021</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>octobre 2021</th><td>0</td><td>0</td><td>0</td><td>4</td><td class="total">4</td></tr>
+<tr><th>septembre 2021</th><td>0</td><td>0</td><td>0</td><td>4</td><td class="total">4</td></tr>
+<tr><th>août 2021</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2021</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>juin 2021</th><td>0</td><td>0</td><td>0</td><td>5</td><td class="total">5</td></tr>
+<tr><th>mai 2021</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>avril 2021</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>mars 2021</th><td>0</td><td>0</td><td>0</td><td>5</td><td class="total">5</td></tr>
+<tr><th>février 2021</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>janvier 2021</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>décembre 2020</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>novembre 2020</th><td>0</td><td>0</td><td>0</td><td>1</td><td class="total">1</td></tr>
+<tr><th>octobre 2020</th><td>0</td><td>0</td><td>0</td><td>6</td><td class="total">6</td></tr>
+<tr><th>septembre 2020</th><td>0</td><td>0</td><td>0</td><td>6</td><td class="total">6</td></tr>
+<tr><th>août 2020</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2020</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juin 2020</th><td>0</td><td>0</td><td>0</td><td>5</td><td class="total">5</td></tr>
+<tr><th>mai 2020</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>avril 2020</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>mars 2020</th><td>0</td><td>0</td><td>0</td><td>2</td><td class="total">2</td></tr>
+<tr><th>février 2020</th><td>0</td><td>0</td><td>0</td><td>3</td><td class="total">3</td></tr>
+<tr><th>janvier 2020</th><td>0</td><td>0</td><td>0</td><td>13</td><td class="total">13</td></tr>
+<tr><th>décembre 2019</th><td>0</td><td>0</td><td>0</td><td>4</td><td class="total">4</td></tr>
+<tr><th>novembre 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>octobre 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>septembre 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>août 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juillet 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>juin 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>mai 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>avril 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>mars 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>février 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+<tr><th>janvier 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
+</tbody></table></div>
+</div>
+
+<p class="state">Première ouverture — lecture en cours</p>
+<div class="frame">
+<h2>Initiations</h2><a href="#">Accueil</a>
+<p class="read">Lecture de Paheko…</p>
+<button disabled>Actualiser</button>
+</div>
+
+<p class="state">Actualisation refusée — statistiques de la lecture précédente conservées</p>
+<div class="frame">
+<h2>Initiations</h2><a href="#">Accueil</a>
+<p class="error">Impossible de joindre https://lafab.paheko.cloud.</p>
+<button>Actualiser</button>
+<p class="read">(graphiques et tableau inchangés)</p>
+</div>
+</body>
+</html>
