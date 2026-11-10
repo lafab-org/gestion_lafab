@@ -13,7 +13,16 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page, expect
 
-from tests.fakes import API_ID, API_TOKEN, MEMBERSHIP, basic_auth, run_sql
+from tests.fakes import (
+    API_ID,
+    API_TOKEN,
+    DIGITAL,
+    MEMBERSHIP,
+    WOOD,
+    basic_auth,
+    run_sql,
+)
+from tests.stats_html import month_label
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -192,6 +201,57 @@ def test_consult_memberships(tmp_path, paheko_server, page: Page):
         page.get_by_role("link", name="Accueil").click()
         page.get_by_role("link", name="Adhésions").click()
         expect(status).to_have_text(first)
+        assert readings() == 1
+
+        before = datetime.now()
+        button = page.get_by_role("button", name="Actualiser")
+        button.click()
+        deadline = time.monotonic() + 10
+        while readings() < 2 and time.monotonic() < deadline:
+            time.sleep(0.05)
+        expect(button).to_be_enabled()
+        expect(status).to_be_visible()
+        after = datetime.now()
+        assert status.text_content() in {read_text(before), read_text(after)}
+        assert readings() == 2
+    finally:
+        stop(process)
+
+
+# /scenarios/consulter-les-initiations
+def test_consult_initiations(tmp_path, paheko_server, page: Page):
+    today = date.today()
+    paheko_server.registrations = [
+        (1, DIGITAL[0], today.isoformat()),
+        (2, WOOD[0], today.replace(month=1, day=1).isoformat()),
+    ]
+    write_env(tmp_path, paheko_server.url)
+    process, opened = launch(tmp_path)
+    try:
+        goto_when_up(page, wait_for(opened, timeout=30))
+
+        def readings() -> int:
+            return sum("SELECT 1" not in q for q in paheko_server.queries)
+
+        paheko_server.gate.clear()
+        page.get_by_role("link", name="Initiations").click()
+        expect(page.get_by_text("Lecture de Paheko…")).to_be_visible()
+        before = datetime.now().replace(second=0, microsecond=0)
+        paheko_server.gate.set()
+        status = page.get_by_text(re.compile(r"^Données Paheko lues le "))
+        expect(status).to_be_visible()
+        after = datetime.now()
+        assert status.text_content() in {read_text(before), read_text(after)}
+        expect(page.locator("svg").filter(has=page.locator("title"))).to_have_count(2)
+        rows = page.get_by_role("table").get_by_role("row")
+        labels = [
+            m.group(0)
+            for m in (re.match(r"\S+ \d{4}", t.strip()) for t in rows.all_inner_texts())
+            if m
+        ]
+        assert labels == [
+            month_label(today.year, month) for month in range(today.month, 0, -1)
+        ]
         assert readings() == 1
 
         before = datetime.now()

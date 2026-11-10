@@ -30,8 +30,33 @@ CREATE TABLE services_users (
     expiry_date TEXT NULL
 );
 INSERT INTO services (id, label, duration) VALUES
-    (1, '- Adhésion', 365), (23, 'Initiation laser', NULL);
+    (1, '- Adhésion', 365),
+    (19, 'Atelier libre', NULL),
+    (20, 'Initiation assemblage bois', NULL),
+    (21, 'Initiation assemblage main', NULL),
+    (22, 'Initiation dégau-rabo', NULL),
+    (23, 'Initiation laser', NULL),
+    (24, 'Initiation projet cordonnerie', NULL),
+    (25, 'Initiation scie à format', NULL),
+    (26, 'Initiation hors catégorie', NULL),
+    (27, 'Initiation soudage électrode enrobée', NULL),
+    (28, 'Initiation tour à bois', NULL),
+    (29, 'Initiation électro-portatif bois', NULL),
+    (30, 'Initiation soudage TIG', NULL),
+    (31, 'Initiation impression 3D', NULL),
+    (32, 'Initiation couture', NULL),
+    (33, 'Initiation électro-portatif bois NV2', NULL),
+    (34, 'Initiation soudage semi-auto', NULL),
+    (35, 'Initiation nouvelle', NULL);
 """
+
+# Paheko activities of initiation, by category.
+WOOD = [20, 21, 22, 25, 28, 29, 33]
+METAL = [27, 30, 34]
+SOFT = [24, 32]
+DIGITAL = [23, 31]
+# Activities that are not initiations of a category.
+NOT_INITIATIONS = [1, 19, 26, 35]
 
 
 def basic_auth(api_id: str, token: str) -> str:

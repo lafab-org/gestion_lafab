@@ -86,3 +86,39 @@ class Stats:
 
     def has_bar(self, year: int, total: int) -> bool:
         return re.search(rf"\b{year} : {total}\b(?! adhésions)", self.text) is not None
+
+
+CATEGORIES = ["bois", "métal", "souple", "numérique"]
+
+
+def month_label(year: int, month: int) -> str:
+    return f"{MONTHS[month - 1]} {year}"
+
+
+class InitiationStats:
+    """What an HTML fragment of the initiations shows: its text, the header
+    of its table, and its table rows by month label (`<mois> <année>`)."""
+
+    def __init__(self, html: str) -> None:
+        parser = _Parser()
+        parser.feed(html)
+        self.text = normalize(" ".join(parser.texts))
+        self.header: list[str] = []
+        self.months: list[str] = []
+        self.cells: dict[str, list[str]] = {}
+        label = re.compile(rf"(?:{'|'.join(MONTHS)}) \d{{4}}")
+        for row in parser.rows:
+            if len(row) == 6 and label.fullmatch(row[0]):
+                self.months.append(row[0])
+                self.cells[row[0]] = row[1:]
+            elif len(row) == 6 and row[5] == "Total" and not self.header:
+                self.header = row[1:]
+
+    def has(self, hover: str) -> bool:
+        """Whether the exact hover text appears, its number not prolonged."""
+        return re.search(re.escape(hover) + r"(?!\d)", self.text) is not None
+
+    def has_monthly(self, year: int, month: int) -> bool:
+        """Whether any segment of the monthly chart is shown for that month."""
+        pattern = rf"(?:{'|'.join(CATEGORIES)}), {month_label(year, month)} : \d+"
+        return re.search(pattern, self.text) is not None
