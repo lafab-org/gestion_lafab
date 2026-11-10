@@ -1,4 +1,5 @@
-from collections.abc import AsyncIterator, Mapping
+from collections.abc import AsyncIterator, Callable, Mapping
+from datetime import datetime
 from html import escape
 from pathlib import Path
 
@@ -28,11 +29,13 @@ def status_html(message: str, css_class: str) -> str:
 def create_app(
     env: Mapping[str, str] | None = None,
     paheko_transport: httpx.AsyncBaseTransport | None = None,
+    now: Callable[[], datetime] = datetime.now,
 ) -> Litestar:
     """Build the application.
 
     env: configuration variables; read from `.env` and the environment when None.
     paheko_transport: transport for Paheko API calls; the network when None.
+    now: the current local date and time.
     """
 
     def current_env() -> Mapping[str, str]:

@@ -1,17 +1,25 @@
 import socket
 import threading
 import time
+from datetime import datetime
 
 import pytest
 import uvicorn
 
 from gestion_lafab.app import create_app
-from tests.fakes import ENV, FakePaheko
+from tests.fakes import ENV, Clock, FakePaheko
+
+NOW = datetime(2026, 11, 10, 14, 32)
 
 
 @pytest.fixture
 def paheko() -> FakePaheko:
     return FakePaheko()
+
+
+@pytest.fixture
+def clock() -> Clock:
+    return Clock(NOW)
 
 
 def free_port() -> int:
@@ -21,10 +29,10 @@ def free_port() -> int:
 
 
 @pytest.fixture
-def server(paheko):
+def server(paheko, clock):
     """The application served on a free port, with the simulated Paheko."""
     port = free_port()
-    app = create_app(dict(ENV), paheko.transport())
+    app = create_app(dict(ENV), paheko.transport(), now=clock)
     config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
     srv = uvicorn.Server(config)
     thread = threading.Thread(target=srv.run, daemon=True)
