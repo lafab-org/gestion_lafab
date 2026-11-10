@@ -22,4 +22,7 @@ def main() -> None:
         webbrowser.open(f"http://{HOST}:{PORT}/")
 
     threading.Thread(target=open_when_started, daemon=True).start()
-    server.run()
+    try:
+        server.run()
+    except KeyboardInterrupt:
+        pass  # Ctrl+C: uvicorn has already shut down cleanly.
