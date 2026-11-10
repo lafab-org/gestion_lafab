@@ -44,7 +44,7 @@ def month_count(stats: Stats, year: int, month: int) -> str:
     return stats.monthly[year][month - 1]
 
 
-# /operations/lire-les-adhesions/ok
+# /operations/lire-les-adhesions/ok /ui/page-des-adhesions/stats
 # /model/statistiques-des-adhesions/paheko
 def test_ok_shows_statistics(paheko):
     paheko.registrations = adhesions("2025-03-04", "2025-03-20", "2026-01-15")
@@ -55,7 +55,7 @@ def test_ok_shows_statistics(paheko):
     assert stats.total[2025] == "2"
 
 
-# /operations/lire-les-adhesions/ok
+# /operations/lire-les-adhesions/ok /ui/page-des-adhesions/stats
 def test_ok_replaces_reading(paheko):
     paheko.registrations = adhesions("2025-03-04")
     app = create_app(dict(ENV), paheko.transport(), Clock(NOW))
