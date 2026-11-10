@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import httpx
 
@@ -14,13 +14,22 @@ class CheckResult:
     message: str
 
 
-async def check_connection(
-    env: Mapping[str, str], transport: httpx.AsyncBaseTransport | None
-) -> CheckResult:
-    """Run a trivial read-only query against the Paheko API."""
+@dataclass(frozen=True)
+class SqlResult:
+    """Rows of a query, or the message explaining why there are none."""
+
+    ok: bool
+    message: str = ""
+    rows: list[dict] = field(default_factory=list)
+
+
+async def run_sql(
+    env: Mapping[str, str], transport: httpx.AsyncBaseTransport | None, query: str
+) -> SqlResult:
+    """Run a read-only query through the SQL API of Paheko."""
     missing = missing_variables(env)
     if missing:
-        return CheckResult(False, f"Configuration manquante : {', '.join(missing)}.")
+        return SqlResult(False, f"Configuration manquante : {', '.join(missing)}.")
     url = env["PAHEKO_URL"]
     try:
         async with httpx.AsyncClient(
@@ -29,13 +38,27 @@ async def check_connection(
             transport=transport,
             timeout=TIMEOUT,
         ) as client:
-            response = await client.post("/api/sql/", content="SELECT 1;")
+            response = await client.post("/api/sql/", content=query)
     except (httpx.TransportError, httpx.InvalidURL):
-        return CheckResult(False, f"Impossible de joindre {url}.")
-    if response.status_code == 200:
-        return CheckResult(True, f"Connecté à {url}.")
+        return SqlResult(False, f"Impossible de joindre {url}.")
     if response.status_code in (401, 403):
-        return CheckResult(False, f"Identifiants refusés par {url}.")
-    return CheckResult(
-        False, f"Réponse inattendue de {url} : code {response.status_code}."
-    )
+        return SqlResult(False, f"Identifiants refusés par {url}.")
+    if response.status_code != 200:
+        return SqlResult(
+            False, f"Réponse inattendue de {url} : code {response.status_code}."
+        )
+    try:
+        rows = response.json().get("results", [])
+    except ValueError:
+        rows = []
+    return SqlResult(True, rows=rows)
+
+
+async def check_connection(
+    env: Mapping[str, str], transport: httpx.AsyncBaseTransport | None
+) -> CheckResult:
+    """Run a trivial read-only query against the Paheko API."""
+    result = await run_sql(env, transport, "SELECT 1;")
+    if result.ok:
+        return CheckResult(True, f"Connecté à {env['PAHEKO_URL']}.")
+    return CheckResult(False, result.message)

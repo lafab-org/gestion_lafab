@@ -69,6 +69,7 @@ Les Statistiques des adhésions, de haut en bas :
   lecture (`10 novembre`), `<écart>` la variation de `<m>` à `<n>` en
   pourcentage arrondi à l'unité, précédé de `+` ou `−` (`−4 %`,
   `+12 %`, `0 %`).
+- [no-previous] `<m>` égal à 0 : `—` à la place de `<écart>`.
 
 ## Graphique du cumul
 

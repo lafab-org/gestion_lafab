@@ -1,0 +1,63 @@
+<div id="membership-stats">
+{% if stats %}
+<p class="indicator">{{ indicator }}</p>
+
+<h2>Cumul mensuel</h2>
+<div class="legend">
+  <span class="swatch current"></span>{{ stats.current_year }}
+  <span class="swatch previous"></span>{{ stats.current_year - 1 }}
+  <span class="swatch older"></span>{{ stats.years[0] }} à {{ stats.current_year - 2 }}
+</div>
+<svg viewBox="0 0 {{ cumul_chart.width }} {{ cumul_chart.height }}" role="img" aria-label="Cumul mensuel des adhésions par année">
+  {% for t in cumul_chart.grid %}
+  <line class="grid" x1="{{ cumul_chart.left }}" x2="{{ cumul_chart.right }}" y1="{{ '%.1f' % t.y }}" y2="{{ '%.1f' % t.y }}"/>
+  <text class="tick" x="{{ t.x }}" y="{{ '%.1f' % (t.y + 4) }}" text-anchor="end">{{ t.value }}</text>
+  {% endfor %}
+  {% for t in cumul_chart.ticks %}
+  <text class="tick" x="{{ '%.1f' % t.x }}" y="{{ t.y }}" text-anchor="middle">{{ t.value }}</text>
+  {% endfor %}
+  {% for c in curves %}
+  <g class="{{ c.role }}">
+    <polyline points="{{ c.points }}"/>
+    {% for m in c.marks %}
+    <circle cx="{{ '%.1f' % m.x }}" cy="{{ '%.1f' % m.y }}" r="4"><title>{{ m.hover }}</title></circle>
+    {% endfor %}
+    {% if c.role != 'older' and c.marks %}
+    {% set last = c.marks[-1] %}
+    <text class="label" x="{{ '%.1f' % (last.x + 8) }}" y="{{ '%.1f' % (last.y + 4) }}">{{ c.year }}</text>
+    {% endif %}
+  </g>
+  {% endfor %}
+</svg>
+
+<h2>Total annuel</h2>
+<svg viewBox="0 0 {{ annual_chart.width }} {{ annual_chart.height }}" role="img" aria-label="Total des adhésions par année">
+  {% for t in annual_chart.grid %}
+  <line class="grid" x1="{{ annual_chart.left }}" x2="{{ annual_chart.right }}" y1="{{ '%.1f' % t.y }}" y2="{{ '%.1f' % t.y }}"/>
+  <text class="tick" x="{{ t.x }}" y="{{ '%.1f' % (t.y + 4) }}" text-anchor="end">{{ t.value }}</text>
+  {% endfor %}
+  {% for b in bars %}
+  <rect class="bar{% if b.partial %} partial{% endif %}" x="{{ '%.1f' % b.x }}" y="{{ '%.1f' % b.y }}" width="{{ '%.1f' % b.width }}" height="{{ '%.1f' % (b.bottom - b.y) }}" rx="3"><title>{{ b.hover }}</title></rect>
+  <text class="value" x="{{ '%.1f' % (b.x + b.width / 2) }}" y="{{ '%.1f' % (b.y - 6) }}" text-anchor="middle">{{ b.value }}</text>
+  {% if b.partial %}<text class="tick" x="{{ '%.1f' % (b.x + b.width / 2) }}" y="{{ '%.1f' % (b.y + 16) }}" text-anchor="middle">en cours</text>{% endif %}
+  {% endfor %}
+  {% for t in annual_chart.ticks %}
+  <text class="tick" x="{{ '%.1f' % t.x }}" y="{{ t.y }}" text-anchor="middle">{{ t.value }}</text>
+  {% endfor %}
+</svg>
+
+<h2>Adhésions par mois</h2>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Année</th>{% for m in month_ticks %}<th>{{ m }}</th>{% endfor %}<th>Total</th></tr>
+  </thead>
+  <tbody>
+    {% for year in stats.years | reverse %}
+    <tr><th>{{ year }}</th>{% for n in stats.monthly[year] %}<td>{{ '' if n is none else n }}</td>{% endfor %}<td class="total">{{ stats.total[year] }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+</div>

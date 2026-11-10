@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adhésions — Gestion La Fabrique</title>
+  <script type="module" src="/static/datastar.js"></script>
+  <style>
+    :root {
+      --text: #0b0b0b; --muted: #52514e; --grid: #e6e5e1;
+      --current: #2a78d6; --previous: #eb6834; --older: #c9c8c3;
+      --surface: #fcfcfb; --error: #cf222e;
+    }
+    body { font-family: system-ui, sans-serif; color: var(--text); background: var(--surface);
+           max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
+    header h1 { display: inline; margin-right: 1rem; }
+    .read { color: var(--muted); }
+    .error { color: var(--error); }
+    .indicator { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0; }
+    h2 { font-size: 1rem; margin: 2rem 0 .5rem; }
+    svg { width: 100%; height: auto; display: block; }
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .tick { fill: var(--muted); font-size: 11px; }
+    .label { fill: var(--text); font-size: 12px; font-weight: 600; }
+    .value { fill: var(--muted); font-size: 11px; }
+    polyline { fill: none; stroke-width: 2; stroke-linejoin: round; }
+    .older polyline { stroke: var(--older); stroke-width: 1.5; }
+    .previous polyline { stroke: var(--previous); }
+    .current polyline { stroke: var(--current); stroke-width: 3; }
+    circle { stroke: var(--surface); stroke-width: 2; }
+    .current circle { fill: var(--current); }
+    .previous circle { fill: var(--previous); }
+    .older circle { fill: var(--older); fill-opacity: 0; stroke: none; }
+    .older circle:hover { fill-opacity: 1; }
+    circle:hover { r: 6; }
+    .bar { fill: var(--current); }
+    .bar.partial { fill-opacity: .35; stroke: var(--current); stroke-dasharray: 4 3; }
+    .bar:hover { fill-opacity: .8; }
+    .legend { font-size: .85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+    .swatch { display: inline-block; width: 16px; height: 3px; border-radius: 2px; margin-left: .75rem; }
+    .swatch.current { background: var(--current); }
+    .swatch.previous { background: var(--previous); }
+    .swatch.older { background: var(--older); }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .9rem; }
+    th, td { padding: .3rem .5rem; text-align: right; border-bottom: 1px solid var(--grid); }
+    thead th { color: var(--muted); font-weight: 600; }
+    tbody th { text-align: left; }
+    td.total { font-weight: 600; }
+  </style>
+</head>
+<body data-signals="{reading: {{ 'true' if init else 'false' }}}">
+  <header>
+    <h1>Adhésions</h1>
+    <a href="/">Accueil</a>
+  </header>
+  {% if init %}<div data-init="@get('/adhesions/lecture')"></div>{% endif %}
+  {{ status | safe }}
+  <button data-attr:disabled="$reading" data-on:click="@get('/adhesions/lecture')"{% if init %} disabled{% endif %}>Actualiser</button>
+  {{ stats | safe }}
+</body>
+</html>

@@ -331,3 +331,13 @@ def test_table(paheko):
     assert stats.total[2024] == "2"
     assert stats.monthly[2026][10:] == ["0", ""]
     assert stats.total[2026] == "1"
+
+
+# /ui/indicateur/no-previous
+def test_indicator_no_previous(paheko):
+    paheko.registrations = adhesions("2025-12-01", "2026-01-05")
+    _, stats = read(paheko)
+    assert (
+        "2026 : 1 adhésions au 10 novembre, — par rapport à 2025"
+        " à la même date (0)." in stats.text
+    )
