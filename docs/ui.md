@@ -6,7 +6,7 @@
 
 Affiche, de haut en bas :
 - [title] le titre `Gestion La Fabrique` ;
-- [status] l'État de connexion ;
+- [status] le Statut de connexion ;
 - [recheck] un bouton `Tester à nouveau`.
 
 Actions :
@@ -14,7 +14,7 @@ Actions :
   /operations/tester-la-connexion ; indisponible pendant un
   test.
 
-## État de connexion
+## Statut de connexion
 
 Affiche, selon l'état :
 - [checking] Page ouverte, ou test en cours : `Test en cours…`.

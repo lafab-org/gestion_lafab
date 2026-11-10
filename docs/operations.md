@@ -4,8 +4,8 @@
 
 Vérifie que l'API Paheko répond aux identifiants configurés.
 
-HTTP : `GET /connexion`, réponse Datastar qui remplace l'état de
-connexion de la page.
+HTTP : `GET /connexion`, réponse Datastar qui remplace le statut
+de connexion de la page.
 
 - [config] Une variable de configuration absente ou vide : refusé,
   `Configuration manquante : <variables>.`, les variables manquantes

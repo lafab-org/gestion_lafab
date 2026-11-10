@@ -27,5 +27,7 @@
 ## Tests et qualité
 
 - Tests avec pytest ; l'API Paheko y est simulée, jamais appelée.
+- Tests de l'interface dans un navigateur avec Playwright
+  (`pytest-playwright`, Chromium sans affichage).
 - Vérifications : `uv run pytest`, `uv run ruff check`,
   `uv run ruff format --check`.
