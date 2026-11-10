@@ -67,7 +67,7 @@ def test_ok_replaces_reading(paheko):
     assert month_count(second, 2025, 3) == "2"
 
 
-# /operations/lire-les-adhesions/failed
+# /operations/lire-les-adhesions/failed /ui/page-des-adhesions/stats
 @pytest.mark.parametrize(
     ("setup", "message"),
     [
