@@ -51,6 +51,7 @@
   {% if init %}<div data-init="@get('/initiations/lecture')"></div>{% endif %}
   {{ status | safe }}
   <button data-attr:disabled="$reading" data-on:click="@get('/initiations/lecture')"{% if init %} disabled{% endif %}>Actualiser</button>
+  <a href="/initiations/rapprochement">Rapprochement</a>
   {{ stats | safe }}
 </body>
 </html>

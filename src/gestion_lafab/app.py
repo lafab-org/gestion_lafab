@@ -7,13 +7,15 @@ import httpx
 from datastar_py.litestar import DatastarResponse
 from datastar_py.litestar import ServerSentEventGenerator as SSE
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from litestar import Litestar, MediaType, Response, get
+from litestar import Litestar, MediaType, Request, Response, get, post
+from litestar.datastructures import UploadFile
+from litestar.exceptions import NotFoundException
 from litestar.plugins.jinja import JinjaTemplateEngine
 from litestar.response import Template
 from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
 
-from gestion_lafab import initiations
+from gestion_lafab import initiations, reconciliation
 from gestion_lafab.charts import (
     MONTH_TICKS,
     annual_chart,
@@ -35,6 +37,21 @@ from gestion_lafab.paheko import check_connection
 PACKAGE_DIR = Path(__file__).parent
 CHECKING = "Test en cours…"
 READING = "Lecture de Paheko…"
+RECONCILING = "Rapprochement…"
+NO_EXPORT = "Aucun export des tickets envoyé : ventes de la caisse seulement."
+
+
+def previous_month(day: datetime) -> tuple[int, int]:
+    return (day.year, day.month - 1) if day.month > 1 else (day.year - 1, 12)
+
+
+def parse_month(value: object, default: tuple[int, int]) -> tuple[int, int]:
+    """`AAAA-MM` from the month input; the default if it is not one."""
+    try:
+        year, month = (int(part) for part in str(value).split("-"))
+    except ValueError:
+        return default
+    return (year, month) if 1 <= month <= 12 and 1 <= year <= 9999 else default
 
 
 def status_html(message: str, css_class: str) -> str:
@@ -70,6 +87,8 @@ def create_app(
     memory: dict[str, Reading] = {}
     # The Lecture des initiations, likewise.
     initiation_memory: dict[str, initiations.Reading] = {}
+    # The Rapprochement des initiations, likewise.
+    reconciliation_memory: dict[str, reconciliation.Reconciliation] = {}
 
     def current_env() -> Mapping[str, str]:
         return env if env is not None else read_env()
@@ -191,6 +210,80 @@ def create_app(
 
         return DatastarResponse(events())
 
+    def reconciliation_html(
+        message: str = "",
+        css_class: str = "",
+        result: reconciliation.Reconciliation | None = None,
+        no_export: bool = False,
+    ) -> str:
+        return templates.get_template("reconciliation_result.html").render(
+            message=message,
+            css_class=css_class,
+            result=result,
+            lines=list(zip(result.lines, result.rows())) if result else [],
+            no_export=no_export,
+            no_export_text=NO_EXPORT,
+        )
+
+    @get("/initiations/rapprochement", media_type=MediaType.HTML)
+    async def reconciliation_page() -> Response[str]:
+        year, month = previous_month(now())
+        page = templates.get_template("reconciliation.html").render(
+            month=f"{year:04d}-{month:02d}", result=reconciliation_html()
+        )
+        return Response(page, media_type=MediaType.HTML)
+
+    @post("/initiations/rapprochement", status_code=200)
+    async def reconciliation_run(request: Request) -> DatastarResponse:
+        form = await request.form()
+        year, month = parse_month(form.get("mois"), previous_month(now()))
+        upload = form.get("export")
+        content = b""
+        if isinstance(upload, UploadFile):
+            content = await upload.read()
+            sent = bool(upload.filename) or bool(content)
+        else:
+            sent = bool(upload)
+            content = str(upload or "").encode()
+
+        async def events() -> AsyncIterator[str]:
+            yield SSE.patch_signals({"running": True})
+            yield SSE.patch_elements(reconciliation_html(RECONCILING, "muted"))
+            tickets = reconciliation.parse_export(content) if sent else None
+            if sent and tickets is None:
+                yield SSE.patch_elements(
+                    reconciliation_html(reconciliation.UNREADABLE, "error")
+                )
+            else:
+                result = await reconciliation.reconcile(
+                    current_env(), paheko_transport, year, month, tickets
+                )
+                if result.ok and result.reconciliation is not None:
+                    reconciliation_memory["last"] = result.reconciliation
+                    yield SSE.patch_elements(
+                        reconciliation_html(
+                            result=result.reconciliation, no_export=not sent
+                        )
+                    )
+                else:
+                    yield SSE.patch_elements(
+                        reconciliation_html(result.message, "error")
+                    )
+            yield SSE.patch_signals({"running": False})
+
+        return DatastarResponse(events())
+
+    @get("/initiations/rapprochement.csv")
+    async def reconciliation_csv() -> Response[bytes]:
+        last = reconciliation_memory.get("last")
+        if last is None:
+            raise NotFoundException()
+        return Response(
+            last.csv().encode("utf-8"),
+            media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="{last.filename}"'},
+        )
+
     return Litestar(
         route_handlers=[
             home,
@@ -199,6 +292,9 @@ def create_app(
             adhesions_lecture,
             initiations_page,
             initiations_lecture,
+            reconciliation_page,
+            reconciliation_run,
+            reconciliation_csv,
             create_static_files_router(
                 path="/static", directories=[PACKAGE_DIR / "static"]
             ),

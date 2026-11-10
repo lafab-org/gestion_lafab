@@ -1,0 +1,28 @@
+<div id="reconciliation-result">
+{%- if message %}
+  <p class="{{ css_class }}">{{ message }}</p>
+{%- elif result %}
+  {%- if no_export %}
+  <p class="warn">{{ no_export_text }}</p>
+  {%- endif %}
+  {%- if not lines %}
+  <p>Aucune initiation à ajouter pour {{ result.month_label }}.</p>
+  {%- else %}
+  <div class="count">{{ lines | length }} initiations à ajouter pour {{ result.month_label }}.
+    <form class="download" method="get" action="/initiations/rapprochement.csv"><button type="submit">Télécharger le CSV</button></form></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Numéro de membre</th><th>Membre</th><th>Activité</th><th>Date d'inscription</th><th>Source</th><th>E-mail</th><th>Libellé</th><th>Remarque</th></tr></thead>
+    <tbody>
+    {%- for line, row in lines %}
+      <tr{% if line.incomplete %} class="incomplete"{% endif %}>
+        {%- for value in row[:4] + row[5:] %}
+          {%- set missing = not value and ((loop.index0 < 2 and not line.member) or (loop.index0 == 2 and not line.activity)) -%}
+          <td{% if missing %} class="missing"{% endif %}>{{ value }}</td>
+        {%- endfor -%}
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- endif %}
+{%- endif %}
+</div>

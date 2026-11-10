@@ -114,6 +114,7 @@ def test_link_from_initiations_page(server, paheko, page: Page):
     expect(status).to_be_visible()
     link = page.get_by_role("link", name="Rapprochement")
     y = link.bounding_box()["y"]
+    # @dev43:unsure
     assert status.bounding_box()["y"] < y < monthly(page).bounding_box()["y"]
     link.click()
     expect(page).to_have_url(f"{server}/initiations/rapprochement")
