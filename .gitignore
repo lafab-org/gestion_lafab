@@ -7,3 +7,6 @@ test-results/
 playwright-report/
 .playwright/
 .vscode/
+
+# Données privées (exports TiBillet, Paheko…) : jamais committées
+**/inputs/
