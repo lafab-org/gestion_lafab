@@ -6,7 +6,7 @@
 - Serveur : Litestar, gabarits Jinja2. Écoute sur `127.0.0.1:8000`.
 - Pages : HTML rendu par le serveur, interactivité avec Datastar. Le
   fichier JavaScript de Datastar est servi par l'application.
-- Accès aux API : httpx. Calculs statistiques : pandas.
+- Accès aux API : httpx.
 - Paheko : l'API de `https://lafab.paheko.cloud`, en lecture seule.
   La Lecture Paheko tient en une seule requête SQL.
 - Graphiques : SVG produit par le serveur, sans bibliothèque

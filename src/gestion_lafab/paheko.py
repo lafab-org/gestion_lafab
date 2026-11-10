@@ -21,6 +21,7 @@ class SqlResult:
     ok: bool
     message: str = ""
     rows: list[dict] = field(default_factory=list)
+    answered: bool = False  # the API accepted the query (status 200)
 
 
 async def run_sql(
@@ -48,10 +49,14 @@ async def run_sql(
             False, f"Réponse inattendue de {url} : code {response.status_code}."
         )
     try:
-        rows = response.json().get("results", [])
-    except ValueError:
-        rows = []
-    return SqlResult(True, rows=rows)
+        rows = response.json()["results"]
+        if not isinstance(rows, list):
+            raise TypeError
+    except (ValueError, KeyError, TypeError):
+        return SqlResult(
+            False, f"Réponse inattendue de {url} : code 200.", answered=True
+        )
+    return SqlResult(True, rows=rows, answered=True)
 
 
 async def check_connection(
@@ -59,6 +64,6 @@ async def check_connection(
 ) -> CheckResult:
     """Run a trivial read-only query against the Paheko API."""
     result = await run_sql(env, transport, "SELECT 1;")
-    if result.ok:
+    if result.answered:
         return CheckResult(True, f"Connecté à {env['PAHEKO_URL']}.")
     return CheckResult(False, result.message)
