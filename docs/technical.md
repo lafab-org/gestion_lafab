@@ -8,6 +8,12 @@
   fichier JavaScript de Datastar est servi par l'application.
 - Accès aux API : httpx. Calculs statistiques : pandas.
 - Paheko : l'API de `https://lafab.paheko.cloud`, en lecture seule.
+  La Lecture Paheko tient en une seule requête SQL.
+- Graphiques : SVG produit par le serveur, sans bibliothèque
+  JavaScript.
+- L'Historique des adhésions est le fichier
+  `src/gestion_lafab/data/historique_adhesions.csv` : une ligne par
+  année, l'année puis les 12 nombres mensuels.
 
 ## Lancement et configuration
 
