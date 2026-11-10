@@ -25,8 +25,7 @@ Remplace la Lecture Paheko gardée en mémoire par une nouvelle lecture.
 HTTP : `GET /adhesions/lecture`, réponse Datastar qui remplace le
 contenu de la Page des adhésions.
 
-- [ok] L'API répond : la Lecture Paheko est remplacée ; la réponse
-  affiche les Statistiques des adhésions.
+- [ok] L'API répond : la Lecture Paheko est remplacée.
 - [failed] Configuration absente, identifiants refusés, API
   injoignable ou toute autre réponse : refusé, avec le message du cas
   correspondant de /operations/tester-la-connexion ; la Lecture Paheko
