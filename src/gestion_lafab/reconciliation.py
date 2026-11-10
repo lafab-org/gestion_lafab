@@ -1,13 +1,15 @@
 """Rapprochement des initiations: initiation sales of a month missing in Paheko."""
 
 import csv
+import email.policy
 import io
 import json
 import unicodedata
-from collections import Counter
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
+from email.parser import BytesParser
+from urllib.parse import parse_qsl
 
 import httpx
 
@@ -32,7 +34,7 @@ KEYWORDS = {
     25: ["scie"],
     28: ["tour"],
     29: ["électroportatif", "électro-portatif"],
-    33: ["tock"],
+    33: ["tock", "nv2"],
     24: ["cordonnerie"],
     32: ["couture"],
 }
@@ -150,6 +152,31 @@ class Result:
     ok: bool
     message: str = ""
     reconciliation: Reconciliation | None = None
+
+
+def read_form(content_type: str, body: bytes) -> dict[str, tuple[str | None, bytes]]:
+    """The fields of a form body, in memory: by name, (file name or None,
+    content)."""
+    if content_type.startswith("application/x-www-form-urlencoded"):
+        return {
+            name: (None, value.encode())
+            for name, value in parse_qsl(body.decode("utf-8", "replace"))
+        }
+    if not content_type.startswith("multipart/form-data"):
+        return {}
+    message = BytesParser(policy=email.policy.HTTP).parsebytes(
+        b"Content-Type: " + content_type.encode("latin-1") + b"\r\n\r\n" + body
+    )
+    fields: dict[str, tuple[str | None, bytes]] = {}
+    if not message.is_multipart():
+        return fields
+    for part in message.iter_parts():
+        name = part.get_param("name", header="content-disposition")
+        if name is None:
+            continue
+        payload = part.get_payload(decode=True) or b""
+        fields[str(name)] = (part.get_filename(), payload)
+    return fields
 
 
 def parse_export(content: bytes) -> list[Ticket] | None:
@@ -276,22 +303,31 @@ async def reconcile(
         member = to_member(r, "user_id") if r["user_id"] is not None else None
         activity = activity_of(label)
         quantity = int(r["quantite"])
-        remark = f"Quantité {quantity}, payée par {note}." if quantity > 1 else ""
+        if quantity <= 0:  # refunds and corrections
+            continue
+        remark = ""
+        if quantity > 1:
+            # A note without a name: the quantity only.
+            remark = (
+                f"Quantité {quantity}, payée par {note}."
+                if note.strip()
+                else f"Quantité {quantity}."
+            )
         sales.append(Sale("Caisse", label, day, "", member, note, activity, remark))
         for _ in range(quantity - 1):
             sales.append(Sale("Caisse", label, day, "", None, "", activity, remark))
 
-    registered = Counter(
+    registered = {
         (int(r["id_user"]), int(r["id_service"]), str(r["date"])[:10])
         for r in rows["registrations"]
-    )
+    }
     lines = [
         s
         for s in sales
         if not (
             s.member is not None
             and s.activity is not None
-            and registered[(s.member.id, s.activity, s.day.isoformat())]
+            and (s.member.id, s.activity, s.day.isoformat()) in registered
         )
     ]
     lines.sort(

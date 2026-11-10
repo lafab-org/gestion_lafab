@@ -8,7 +8,6 @@ from datastar_py.litestar import DatastarResponse
 from datastar_py.litestar import ServerSentEventGenerator as SSE
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import Litestar, MediaType, Request, Response, get, post
-from litestar.datastructures import UploadFile
 from litestar.exceptions import NotFoundException
 from litestar.plugins.jinja import JinjaTemplateEngine
 from litestar.response import Template
@@ -235,18 +234,25 @@ def create_app(
 
     @post("/initiations/rapprochement", status_code=200)
     async def reconciliation_run(request: Request) -> DatastarResponse:
-        form = await request.form()
-        year, month = parse_month(form.get("mois"), previous_month(now()))
-        upload = form.get("export")
-        content = b""
-        if isinstance(upload, UploadFile):
-            content = await upload.read()
-            sent = bool(upload.filename) or bool(content)
-        else:
-            sent = bool(upload)
-            content = str(upload or "").encode()
+        # Parsed in memory: the export is never written to disk.
+        form = reconciliation.read_form(
+            request.headers.get("content-type", ""), await request.body()
+        )
+        month_field = form.get("mois", (None, b""))[1].decode("utf-8", "replace")
+        year, month = parse_month(month_field, previous_month(now()))
+        filename, content = form.get("export", (None, b""))
+        sent = bool(filename) or bool(content)
 
         async def events() -> AsyncIterator[str]:
+            try:
+                async for event in reconcile_events():
+                    yield event
+            except Exception:
+                yield SSE.patch_elements(reconciliation_html())
+                yield SSE.patch_signals({"running": False})
+                raise
+
+        async def reconcile_events() -> AsyncIterator[str]:
             yield SSE.patch_signals({"running": True})
             yield SSE.patch_elements(reconciliation_html(RECONCILING, "muted"))
             tickets = reconciliation.parse_export(content) if sent else None
