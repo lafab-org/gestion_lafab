@@ -16,12 +16,16 @@ from playwright.sync_api import Page, expect
 from tests.fakes import (
     API_ID,
     API_TOKEN,
+    CASH_INITIATIONS,
     DIGITAL,
     MEMBERSHIP,
     WOOD,
+    Member,
+    Tab,
     basic_auth,
     run_sql,
 )
+from tests.rapprochement_data import ALICE, BRUNO, export_bytes, ticket
 from tests.stats_html import month_label
 
 REPO = Path(__file__).resolve().parent.parent
@@ -30,7 +34,8 @@ REPO = Path(__file__).resolve().parent.parent
 class PahekoServer:
     """Simulated Paheko over real HTTP; requests wait while `gate` is clear.
 
-    registrations: (id_user, id_service, ISO date) rows queried by the SQL API.
+    registrations: (id_user, id_service, ISO date) rows queried by the SQL API,
+    with `members` (users) and `tabs` (cash register).
     queries: the SQL queries received.
     """
 
@@ -38,6 +43,8 @@ class PahekoServer:
         self.gate = threading.Event()
         self.gate.set()
         self.registrations: list[tuple[int, int, str]] = []
+        self.members: list[Member] = []
+        self.tabs: list[Tab] = []
         self.queries: list[str] = []
         gate = self.gate
         fake = self
@@ -50,7 +57,9 @@ class PahekoServer:
                 gate.wait(timeout=30)
                 ok = self.headers.get("authorization") == basic_auth(API_ID, API_TOKEN)
                 body = (
-                    json.dumps(run_sql(query, fake.registrations)).encode()
+                    json.dumps(
+                        run_sql(query, fake.registrations, fake.members, fake.tabs)
+                    ).encode()
                     if ok
                     else b"{}"
                 )
@@ -265,5 +274,69 @@ def test_consult_initiations(tmp_path, paheko_server, page: Page):
         after = datetime.now()
         assert status.text_content() in {read_text(before), read_text(after)}
         assert readings() == 2
+    finally:
+        stop(process)
+
+
+# /scenarios/preparer-limport-des-initiations
+def test_prepare_initiations_import(tmp_path, paheko_server, page: Page):
+    year, month = 2026, 10
+    paheko_server.members = [ALICE, BRUNO]
+    paheko_server.tabs = [
+        Tab(
+            f"{year}-{month:02d}-14 18:30:00",
+            [("Autre initiation en groupe 3h", 1, CASH_INITIATIONS)],
+            name="Bruno MOREAU",
+            user_id=BRUNO.id,
+        )
+    ]
+    export = tmp_path / "Ticket.json"
+    export.write_bytes(
+        export_bytes(
+            [
+                ticket(
+                    "Initiation à la découpeuse laser",
+                    f"09/{month:02d}/{year} 18:00",
+                    ALICE.email,
+                )
+            ]
+        )
+    )
+    write_env(tmp_path, paheko_server.url)
+    process, opened = launch(tmp_path)
+    try:
+        goto_when_up(page, wait_for(opened, timeout=30))
+        page.get_by_role("link", name="Initiations").click()
+        page.get_by_role("link", name="Rapprochement").click()
+        expect(
+            page.get_by_role("heading", name="Rapprochement des initiations")
+        ).to_be_visible()
+
+        page.locator("input[type=month]").fill(f"{year}-{month:02d}")
+        page.locator("input[type=file]").set_input_files(str(export))
+        page.get_by_role("button", name="Rapprocher").click()
+        expect(
+            page.get_by_text(
+                f"2 initiations à ajouter pour {month_label(year, month)}."
+            )
+        ).to_be_visible()
+        rows = page.get_by_role("table").get_by_role("row")
+        expect(rows).to_have_count(3)
+        ticket_row = rows.filter(has_text="Initiation à la découpeuse laser")
+        cash_row = rows.filter(has_text="Autre initiation en groupe 3h")
+        expect(ticket_row).to_have_count(1)
+        expect(cash_row).to_have_count(1)
+        styles = """r => [r, ...r.children].map(e => {
+            const s = getComputedStyle(e);
+            return [s.backgroundColor, s.color, s.fontWeight, s.outline];
+        })"""
+        assert cash_row.evaluate(styles) != ticket_row.evaluate(styles)
+
+        with page.expect_download() as info:
+            page.get_by_role("button", name="Télécharger le CSV").click()
+        assert (
+            info.value.suggested_filename
+            == f"rapprochement-initiations-{year}-{month:02d}.csv"
+        )
     finally:
         stop(process)
