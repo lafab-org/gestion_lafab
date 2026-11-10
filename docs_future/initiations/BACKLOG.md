@@ -6,15 +6,7 @@ avec les ventes.
 
 ## Outline
 
-1. Statistiques : /model/categorie-dinitiation, /model/initiation,
-   /model/lecture-des-initiations, /model/statistiques-des-initiations,
-   /operations/lire-les-initiations, /ui/page-daccueil,
-   /ui/page-des-initiations, /ui/statut-de-lecture,
-   /ui/statistiques-des-initiations-affichees, /ui/graphique-mensuel-des-initiations,
-   /ui/graphique-annuel-des-initiations,
-   /ui/tableau-mensuel-des-initiations, /technical/pile,
-   /scenarios/consulter-les-initiations.
-2. Rapprochement : /model/categorie-dinitiation,
+1. Rapprochement : /model/categorie-dinitiation, /model/initiation,
    /model/membre, /model/billet, /model/ligne-de-caisse,
    /model/mot-cle-dactivite, /model/vente-dinitiation,
    /model/export-des-tickets, /model/rapprochement-des-initiations,
