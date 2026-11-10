@@ -13,7 +13,14 @@ from litestar.response import Template
 from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
 
-from gestion_lafab.charts import MONTH_TICKS, annual_chart, cumulative_chart
+from gestion_lafab import initiations
+from gestion_lafab.charts import (
+    MONTH_TICKS,
+    annual_chart,
+    annual_initiation_chart,
+    cumulative_chart,
+    monthly_initiation_chart,
+)
 from gestion_lafab.config import read_env
 from gestion_lafab.membership import (
     Reading,
@@ -61,6 +68,8 @@ def create_app(
     history = load_history()
     # The Lecture Paheko kept in memory while the application runs.
     memory: dict[str, Reading] = {}
+    # The Lecture des initiations, likewise.
+    initiation_memory: dict[str, initiations.Reading] = {}
 
     def current_env() -> Mapping[str, str]:
         return env if env is not None else read_env()
@@ -82,6 +91,22 @@ def create_app(
                 "month_ticks": MONTH_TICKS,
             }
         return templates.get_template("membership_stats.html").render(context)
+
+    def initiations_stats_html() -> str:
+        reading = initiation_memory.get("reading")
+        context: dict = {"stats": None, "categories": initiations.CATEGORIES}
+        if reading is not None:
+            stats = initiations.statistics(reading)
+            monthly_chart, monthly_bars = monthly_initiation_chart(stats)
+            annual, annual_bars = annual_initiation_chart(stats)
+            context.update(
+                stats=stats,
+                monthly_chart=monthly_chart,
+                monthly_bars=monthly_bars,
+                annual_chart=annual,
+                annual_bars=annual_bars,
+            )
+        return templates.get_template("initiations_stats.html").render(context)
 
     @get("/")
     async def home() -> Template:
@@ -134,12 +159,46 @@ def create_app(
 
         return DatastarResponse(events())
 
+    @get("/initiations", media_type=MediaType.HTML)
+    async def initiations_page() -> Response[str]:
+        reading = initiation_memory.get("reading")
+        if reading is None:
+            status = reading_status_html(READING, "")
+        else:
+            status = reading_status_html(instant_text(reading.instant), "read")
+        page = templates.get_template("initiations.html").render(
+            init=reading is None, status=status, stats=initiations_stats_html()
+        )
+        return Response(page, media_type=MediaType.HTML)
+
+    @get("/initiations/lecture")
+    async def initiations_lecture() -> DatastarResponse:
+        async def events() -> AsyncIterator[str]:
+            yield SSE.patch_signals({"reading": True})
+            yield SSE.patch_elements(reading_status_html(READING, ""))
+            result = await initiations.read_initiations(
+                current_env(), paheko_transport, now()
+            )
+            if result.ok and result.reading is not None:
+                initiation_memory["reading"] = result.reading
+                yield SSE.patch_elements(
+                    reading_status_html(instant_text(result.reading.instant), "read")
+                )
+                yield SSE.patch_elements(initiations_stats_html())
+            else:
+                yield SSE.patch_elements(reading_status_html(result.message, "error"))
+            yield SSE.patch_signals({"reading": False})
+
+        return DatastarResponse(events())
+
     return Litestar(
         route_handlers=[
             home,
             connexion,
             adhesions,
             adhesions_lecture,
+            initiations_page,
+            initiations_lecture,
             create_static_files_router(
                 path="/static", directories=[PACKAGE_DIR / "static"]
             ),

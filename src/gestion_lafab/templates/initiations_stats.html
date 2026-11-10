@@ -1,0 +1,55 @@
+{% macro css(category) %}{{ {'bois': 'bois', 'métal': 'metal', 'souple': 'souple', 'numérique': 'numerique'}[category] }}{% endmacro %}
+{% macro legend() %}
+<div class="legend">
+  {% for c in categories %}<span class="swatch {{ css(c) }}"></span>{{ c }}{% endfor %}
+</div>
+{% endmacro %}
+{% macro chart(c, bars, label) %}
+<svg viewBox="0 0 {{ c.width }} {{ c.height }}" role="img" aria-label="{{ label }}">
+  {% for t in c.grid %}
+  <line class="grid" x1="{{ c.left }}" x2="{{ c.right }}" y1="{{ '%.1f' % t.y }}" y2="{{ '%.1f' % t.y }}"/>
+  <text class="tick" x="{{ t.x }}" y="{{ '%.1f' % (t.y + 4) }}" text-anchor="end">{{ t.value }}</text>
+  {% endfor %}
+  {% for t in c.ticks %}
+  <text class="tick" x="{{ '%.1f' % t.x }}" y="{{ t.y }}" text-anchor="middle">{{ t.value }}</text>
+  {% endfor %}
+  {% for b in bars %}
+  <g{% if b.partial %} class="partial"{% endif %}>
+    {% for s in b.segments %}
+    <rect class="seg {{ css(s.category) }}" x="{{ '%.1f' % b.x }}" y="{{ '%.1f' % s.y }}" width="{{ '%.1f' % b.width }}" height="{{ '%.1f' % s.height }}"><title>{{ s.hover }}</title></rect>
+    {% endfor %}
+  </g>
+  {% if b.partial %}<rect class="partial-frame" x="{{ '%.1f' % b.x }}" y="{{ '%.1f' % b.top }}" width="{{ '%.1f' % b.width }}" height="{{ '%.1f' % (b.bottom - b.top) }}"/>{% endif %}
+  <text class="value" x="{{ '%.1f' % (b.x + b.width / 2) }}" y="{{ '%.1f' % (b.top - 5) }}" text-anchor="middle">{{ b.value }}</text>
+  {% endfor %}
+</svg>
+{% endmacro %}
+<div id="initiations-stats">
+{% if stats %}
+<h2>Initiations par mois en {{ stats.current_year }}</h2>
+{{ legend() }}
+{{ chart(monthly_chart, monthly_bars, "Initiations par mois et par catégorie en " ~ stats.current_year) }}
+
+<h2>Initiations par année</h2>
+{{ legend() }}
+{{ chart(annual_chart, annual_bars, "Initiations par année et par catégorie") }}
+
+<h2>Initiations par mois</h2>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Mois</th>{% for c in categories %}<th>{{ c }}</th>{% endfor %}<th>Total</th></tr>
+  </thead>
+  <tbody>
+    {% for row in stats.table_rows() %}
+    <tr>
+      <th>{{ row.label }}</th>
+      {% for n in row.counts %}<td>{{ n }}</td>
+      {% endfor %}<td class="total">{{ row.total }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+</div>

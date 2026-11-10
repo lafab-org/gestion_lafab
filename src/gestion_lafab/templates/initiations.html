@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Initiations — Gestion La Fabrique</title>
+  <script type="module" src="/static/datastar.js"></script>
+  <style>
+    :root {
+      --text: #0b0b0b; --muted: #52514e; --grid: #e6e5e1;
+      --bois: #8b5a2b; --metal: #4682b4; --souple: #8e5cc4; --numerique: #d4a017;
+      --surface: #fcfcfb; --error: #cf222e;
+    }
+    body { font-family: system-ui, sans-serif; color: var(--text); background: var(--surface);
+           max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
+    header h1 { display: inline; margin-right: 1rem; }
+    .read { color: var(--muted); }
+    .error { color: var(--error); }
+    h2 { font-size: 1rem; margin: 2rem 0 .5rem; }
+    svg { width: 100%; height: auto; display: block; }
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .tick { fill: var(--muted); font-size: 11px; }
+    .value { fill: var(--muted); font-size: 11px; }
+    .seg { stroke: var(--surface); stroke-width: 1; }
+    .seg:hover { stroke: var(--text); stroke-width: 2; }
+    .seg.bois { fill: var(--bois); }
+    .seg.metal { fill: var(--metal); }
+    .seg.souple { fill: var(--souple); }
+    .seg.numerique { fill: var(--numerique); }
+    .partial .seg { fill-opacity: .45; }
+    .partial-frame { fill: none; stroke: var(--muted); stroke-dasharray: 4 3; }
+    .legend { font-size: .85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; }
+    .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-left: .75rem; }
+    .swatch.bois { background: var(--bois); }
+    .swatch.metal { background: var(--metal); }
+    .swatch.souple { background: var(--souple); }
+    .swatch.numerique { background: var(--numerique); }
+    .table-wrap { overflow-x: auto; max-height: 24rem; overflow-y: auto; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .9rem; }
+    th, td { padding: .3rem .5rem; text-align: right; border-bottom: 1px solid var(--grid); }
+    thead th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
+    tbody th, thead th:first-child { text-align: left; font-weight: 400; }
+    td.total { font-weight: 600; }
+  </style>
+</head>
+<body data-signals="{reading: {{ 'true' if init else 'false' }}}">
+  <header>
+    <h1>Initiations</h1>
+    <a href="/">Accueil</a>
+  </header>
+  {% if init %}<div data-init="@get('/initiations/lecture')"></div>{% endif %}
+  {{ status | safe }}
+  <button data-attr:disabled="$reading" data-on:click="@get('/initiations/lecture')"{% if init %} disabled{% endif %}>Actualiser</button>
+  {{ stats | safe }}
+</body>
+</html>

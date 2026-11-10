@@ -264,6 +264,7 @@ def test_category_colors(server, paheko, page: Page):
         for b in colors[i + 1 :]:
             assert distance(a, b) > 60
     for category, color in zip(CATEGORIES, colors):
+        # @dev43:unsure
         assert fill_rgb(segment(page, f"{category}, janvier 2026 : \\d+")) == color
         assert fill_rgb(segment(page, f"{category}, 2025 : \\d+")) == color
 
