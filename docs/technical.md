@@ -11,9 +11,11 @@
   La Lecture Paheko tient en une seule requête SQL.
   La Lecture des initiations aussi.
   Le Rapprochement des initiations lit dans Paheko les membres, les
-  inscriptions aux activités d'initiation et les lignes de caisse de
-  la catégorie 5 « D - Initiations » (tables `plugin_pos_*` de
-  l'extension Caisse).
+  libellés des activités d'initiation (`services`), leurs inscriptions
+  et les lignes de caisse de la catégorie 5 « D - Initiations » (tables
+  `plugin_pos_*` de l'extension Caisse). La catégorie d'une ligne de
+  caisse est la catégorie actuelle de son produit ou, si le produit
+  n'existe plus, celle enregistrée sur la ligne.
 - TiBillet : aucun accès à l'API ; l'Export des tickets est envoyé par
   l'utilisateur et n'est pas enregistré sur le disque.
 - CSV du rapprochement : UTF-8, séparateur virgule, chaque valeur entre

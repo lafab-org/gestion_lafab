@@ -135,7 +135,7 @@ vente :
 - 25 : « scie » ;
 - 28 : « tour » ;
 - 29 : « électroportatif », « électro-portatif » ;
-- 33 : « tock » ;
+- 33 : « tock », « nv2 » ;
 - 24 : « cordonnerie » ;
 - 32 : « couture ».
 
@@ -149,7 +149,7 @@ formateurs n'ont pas forcément enregistrée dans Paheko.
 - `date` : la date retenue pour la séance.
 - `email` : l'e-mail du billet ; vide pour la caisse.
 - `membre` : le membre Paheko qui suit l'initiation, s'il est connu.
-- `nom` : le nom de la note de caisse ; vide pour un billet.
+- `nom` : le nom de la note de caisse, ou vide ; vide pour un billet.
 - `activite` : l'activité Paheko d'initiation, si elle est connue.
 - `remarque` : une information utile à la relecture, ou vide.
 

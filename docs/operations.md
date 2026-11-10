@@ -66,10 +66,12 @@ des initiations.
   - [caisse] une vente par Ligne de caisse de `categorie`
     « D - Initiations » et d'`ouverture` dans le mois : `libelle`,
     `membre` et `nom` les siens, `date` son `ouverture` ;
+    - [quantite-nulle] une ligne de `quantite` nulle ou négative : aucune
+      vente ;
     - [quantite] une ligne de `quantite` `q` supérieure à 1 donne `q`
       ventes : la première avec le membre et le nom de la note, les
       autres sans membre ni nom ; toutes avec la remarque
-      `Quantité <q>, payée par <nom>.` ;
+      `Quantité <q>, payée par <nom>.`, `<nom>` le nom de la note ;
   - [nofile] aucun fichier envoyé : seulement les ventes de la caisse ;
   - [activite] `activite` : l'activité dont un Mot-clé d'activité est
     dans `libelle`, sans tenir compte de la casse ni des accents ;
@@ -99,8 +101,7 @@ HTTP : `GET /initiations/rapprochement.csv`.
   une ligne par ligne du rapprochement, dans son ordre, avec les
   colonnes :
   - `Numéro de membre` : le numéro du membre, vide sans membre ;
-  - `Membre` : son nom et prénom ; sans membre, le nom de la note de
-    caisse, vide pour un billet ;
+  - `Membre` : son nom et prénom ; sans membre, le `nom` de la vente ;
   - `Activité` : le libellé Paheko de l'activité, vide sans activité ;
   - `Date d'inscription` : la date, `JJ/MM/AAAA` ;
   - `Payé ?` : `Oui` ;
