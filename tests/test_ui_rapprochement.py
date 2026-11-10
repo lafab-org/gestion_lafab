@@ -14,7 +14,7 @@ from tests.rapprochement_data import (
     export_bytes,
     ticket,
 )
-from tests.test_ui_initiations import monthly, text_rgb
+from tests.test_ui_initiations import REGISTRATIONS, monthly, text_rgb
 
 TITLE = "Rapprochement des initiations"
 RUNNING = "Rapprochement…"
@@ -109,12 +109,12 @@ def setup(paheko) -> None:
 
 # /ui/page-des-initiations/rapprochement-link
 def test_link_from_initiations_page(server, paheko, page: Page):
+    paheko.registrations = REGISTRATIONS
     page.goto(f"{server}/initiations")
     status = page.get_by_text(re.compile(r"^Données Paheko lues le "))
     expect(status).to_be_visible()
     link = page.get_by_role("link", name="Rapprochement")
     y = link.bounding_box()["y"]
-    # @dev43:unsure
     assert status.bounding_box()["y"] < y < monthly(page).bounding_box()["y"]
     link.click()
     expect(page).to_have_url(f"{server}/initiations/rapprochement")

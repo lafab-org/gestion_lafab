@@ -108,11 +108,13 @@ class Member:
 class Tab:
     """A note of the cash register, opened at `opened` (`YYYY-MM-DD HH:MM:SS`).
 
-    lines: (name, quantity, category id) of its items, added after the opening.
+    lines: (name, quantity, category id) of its items, added after the opening;
+    or (name, quantity, category id, category name recorded on the line), the
+    category id None for a product that no longer exists.
     """
 
     opened: str
-    lines: list[tuple[str, int, int]]
+    lines: list[tuple]
     name: str | None = None
     user_id: int | None = None
     added: str | None = None  # when its items were added; an hour later if None
@@ -168,8 +170,16 @@ def run_sql(
             "INSERT INTO plugin_pos_tabs_items (tab, added, product, qty, price,"
             " total, name, category_name) VALUES (?, ?, ?, ?, 1500, ?, ?, ?)",
             [
-                (number, added, 100 + cat, qty, 1500 * qty, name, categories[cat])
-                for name, qty, cat in tab.lines
+                (
+                    number,
+                    added,
+                    None if line[2] is None else 100 + line[2],
+                    line[1],
+                    1500 * line[1],
+                    line[0],
+                    line[3] if len(line) > 3 else categories[line[2]],
+                )
+                for line in tab.lines
             ],
         )
     rows = [dict(row) for row in db.execute(query).fetchall()]

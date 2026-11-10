@@ -237,6 +237,30 @@ def test_cash_selection(client, paheko):
     assert dates["C ouverte fin du mois"] == "31/10/2026"
 
 
+# /operations/rapprocher-les-initiations/caisse /model/ligne-de-caisse
+# /technical/pile
+def test_cash_category_of_line(client, paheko):
+    paheko.tabs = [
+        Tab(
+            "2026-10-05 10:00:00",
+            [
+                # Products that no longer exist: the recorded category.
+                ("A produit supprimé", 1, None, "D - Initiations"),
+                ("Produit supprimé ailleurs", 1, None, "D - Accompagnement"),
+                # Existing products: their current category.
+                ("B produit déplacé ici", 1, CASH_INITIATIONS, "B - Tickets"),
+                ("Produit déplacé ailleurs", 1, CASH_COACHING, "D - Initiations"),
+            ],
+            name="Note",
+        )
+    ]
+    reconcile(client)
+    assert sorted(libelles(csv_rows(client))) == [
+        "A produit supprimé",
+        "B produit déplacé ici",
+    ]
+
+
 # /operations/rapprocher-les-initiations/quantite
 def test_quantity_with_member(client, paheko):
     paheko.tabs = [
@@ -254,6 +278,25 @@ def test_quantity_with_member(client, paheko):
         ["876", "Bruno MOREAU", *common, "Initiation métal TIG 3h", remark],
         ["", "", *common, "Initiation métal TIG 3h", remark],
     ]
+
+
+# /operations/rapprocher-les-initiations/quantite-nulle
+def test_quantity_zero_or_negative(client, paheko):
+    paheko.tabs = [
+        Tab(
+            "2026-10-21 18:00:00",
+            [
+                ("Initiation couture vendue", 1, CASH_INITIATIONS),
+                ("Initiation couture annulée", 0, CASH_INITIATIONS),
+                ("Initiation couture remboursée", -1, CASH_INITIATIONS),
+                ("Initiation laser remboursées", -2, CASH_INITIATIONS),
+            ],
+            name="Bruno MOREAU",
+            user_id=BRUNO.id,
+        )
+    ]
+    reconcile(client)
+    assert libelles(csv_rows(client)) == ["Initiation couture vendue"]
 
 
 # /operations/rapprocher-les-initiations/quantite
@@ -333,6 +376,21 @@ def test_activity_keywords(client, libelle, activity):
     ],
 )
 def test_activity_none_or_several(client, libelle, label):
+    reconcile(client, export=[ticket(libelle, "09/10/2026 18:00", UNKNOWN)])
+    assert csv_rows(client)[0][2] == label
+
+
+# /operations/rapprocher-les-initiations/activite
+# /operations/rapprocher-les-initiations/activite-vide /model/mot-cle-dactivite
+@pytest.mark.parametrize(
+    ("libelle", "label"),
+    [
+        ("Initiation électro-portatif bois NV2", ""),
+        ("Initiation tock nv2", LABELS[33]),
+        ("Initiation bois Nv2", LABELS[33]),
+    ],
+)
+def test_activity_nv2(client, libelle, label):
     reconcile(client, export=[ticket(libelle, "09/10/2026 18:00", UNKNOWN)])
     assert csv_rows(client)[0][2] == label
 
