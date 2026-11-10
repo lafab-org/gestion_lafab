@@ -223,7 +223,7 @@ def test_consult_initiations(tmp_path, paheko_server, page: Page):
     today = date.today()
     paheko_server.registrations = [
         (1, DIGITAL[0], today.isoformat()),
-        (2, WOOD[0], today.replace(month=1, day=1).isoformat()),
+        (2, WOOD[0], f"{today.year - 1}-06-15"),
     ]
     write_env(tmp_path, paheko_server.url)
     process, opened = launch(tmp_path)
@@ -251,7 +251,7 @@ def test_consult_initiations(tmp_path, paheko_server, page: Page):
         ]
         assert labels == [
             month_label(today.year, month) for month in range(today.month, 0, -1)
-        ]
+        ] + [month_label(today.year - 1, month) for month in range(12, 0, -1)]
         assert readings() == 1
 
         before = datetime.now()

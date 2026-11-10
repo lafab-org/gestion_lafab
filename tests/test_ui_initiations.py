@@ -256,7 +256,11 @@ def test_failed_refresh_keeps_statistics(server, paheko, clock, page: Page):
 
 # /ui/statistiques-des-initiations-affichees/colors
 def test_category_colors(server, paheko, page: Page):
-    paheko.registrations = REGISTRATIONS
+    paheko.registrations = REGISTRATIONS + [
+        (11, METAL[1], "2026-01-07"),
+        (12, SOFT[1], "2026-01-08"),
+        (13, DIGITAL[1], "2026-01-09"),
+    ]
     open_page(page, server)
     expect(monthly(page)).to_be_visible()
     colors = [fill_rgb(segment(page, f"{c}, mars 2026 : \\d+")) for c in CATEGORIES]
@@ -264,7 +268,6 @@ def test_category_colors(server, paheko, page: Page):
         for b in colors[i + 1 :]:
             assert distance(a, b) > 60
     for category, color in zip(CATEGORIES, colors):
-        # @dev43:unsure
         assert fill_rgb(segment(page, f"{category}, janvier 2026 : \\d+")) == color
         assert fill_rgb(segment(page, f"{category}, 2025 : \\d+")) == color
 
@@ -274,22 +277,56 @@ def test_legend(server, paheko, page: Page):
     paheko.registrations = REGISTRATIONS
     open_page(page, server)
     expect(monthly(page)).to_be_visible()
-    painted = page.evaluate(
-        """() => [...document.querySelectorAll("body *")]
-            .filter(e => e.tagName !== "title" && !e.querySelector(":scope > title"))
-            .flatMap(e => {
-                const s = getComputedStyle(e);
-                return [s.backgroundColor, s.fill, s.color, s.stroke];
-            })"""
-    )
-    painted = {
-        tuple(int(x) for x in re.findall(r"\d+", p)[:3])
-        for p in painted
-        if p.startswith("rgb")
+    colors = {
+        category: segment(page, f"{category}, 2025 : \\d+").evaluate(
+            "e => getComputedStyle(e).fill"
+        )
+        for category in CATEGORIES
     }
-    for category in CATEGORIES:
-        expect(page.get_by_text(category, exact=True).first).to_be_visible()
-        assert fill_rgb(segment(page, f"{category}, 2025 : \\d+")) in painted
+    # For each label outside the table, the colour of the nearest element
+    # painted with a category colour, outside the bars of the charts.
+    nearest = page.evaluate(
+        """colors => {
+            const palette = Object.values(colors);
+            const painted = [...document.querySelectorAll("body *")]
+                .filter(e => e.tagName !== "title" && !e.closest("table")
+                    && !e.querySelector(":scope > title"))
+                .map(e => {
+                    const s = getComputedStyle(e);
+                    const color = [s.backgroundColor, s.fill]
+                        .find(p => palette.includes(p));
+                    return {color, box: e.getBoundingClientRect()};
+                })
+                .filter(p => p.color && p.box.width > 0 && p.box.height > 0);
+            const gap = (a, b) => Math.hypot(
+                Math.max(0, a.left - b.right, b.left - a.right),
+                Math.max(0, a.top - b.bottom, b.top - a.bottom));
+            const found = [];
+            const walker = document.createTreeWalker(
+                document.body, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) {
+                const node = walker.currentNode;
+                const label = node.textContent.trim();
+                if (!(label in colors)) continue;
+                if (node.parentElement.closest("table, title")) continue;
+                const range = document.createRange();
+                range.selectNodeContents(node);
+                const box = range.getBoundingClientRect();
+                if (box.width === 0) continue;
+                let best = null;
+                for (const p of painted) {
+                    const d = gap(box, p.box);
+                    if (best === null || d < best.d) best = {d, color: p.color};
+                }
+                found.push([label, best && best.color]);
+            }
+            return found;
+        }""",
+        colors,
+    )
+    assert {label for label, _ in nearest} == set(CATEGORIES)
+    for label, color in nearest:
+        assert color == colors[label], label
 
 
 # /ui/statistiques-des-initiations-affichees/colors
@@ -306,12 +343,21 @@ def test_stacking_order(server, paheko, page: Page):
 
 # /ui/graphique-mensuel-des-initiations
 def test_monthly_bars_in_order(server, paheko, page: Page):
-    paheko.registrations = REGISTRATIONS
+    paheko.registrations = REGISTRATIONS + [
+        (50 + month, WOOD[0], f"2026-{month:02d}-05") for month in range(1, 12)
+    ]
     open_page(page, server)
     expect(monthly(page)).to_be_visible()
-    january = segment(page, "bois, janvier 2026 : \\d+").bounding_box()
-    march = segment(page, "bois, mars 2026 : \\d+").bounding_box()
-    assert january["x"] < march["x"]
+    months = [
+        "janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+        "août", "septembre", "octobre", "novembre",
+    ]  # fmt: skip
+    xs = [
+        segment(page, f"bois, {month} 2026 : \\d+").bounding_box()["x"]
+        for month in months
+    ]
+    assert xs == sorted(xs)
+    assert len(set(xs)) == len(xs)
 
 
 # /ui/graphique-annuel-des-initiations
@@ -337,3 +383,4 @@ def test_annual_partial(server, paheko, page: Page):
     older = styles(segment(page, "bois, 2024 : \\d+"))
     assert current != previous
     assert current != older
+    assert previous == older

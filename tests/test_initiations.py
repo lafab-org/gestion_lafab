@@ -157,6 +157,17 @@ def test_other_activities_are_not_initiations(paheko):
     assert row(stats, 2026, 5) == ["0"] * 5
 
 
+# /model/initiation /model/statistiques-des-initiations
+def test_member_with_several_initiations(paheko):
+    paheko.registrations = [
+        (7, LASER, "2026-03-04"),
+        (7, TIG, "2026-03-04"),
+        (7, LASER, "2026-03-25"),
+    ]
+    stats = read(paheko)
+    assert row(stats, 2026, 3) == ["0", "1", "0", "2", "3"]
+
+
 # /model/statistiques-des-initiations
 def test_no_initiation_current_year_only(paheko):
     stats = read(paheko)
