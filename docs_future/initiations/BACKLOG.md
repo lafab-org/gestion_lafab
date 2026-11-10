@@ -16,3 +16,17 @@ avec les ventes.
    /scenarios/preparer-limport-des-initiations.
 
 ## Lessons
+
+- Le Rapprochement a besoin de sa propre requête Paheko, avec membre et
+  activité : celle des initiations ne lit que `id_service` et `date`.
+- Le Paheko simulé de `tests/fakes.py` a déjà les activités 20 à 35 par
+  catégorie et des activités hors initiation, réutilisables.
+
+## For the human
+
+- `app.py` répète par page la paire de routes page + lecture et sa
+  mémoire : à factoriser à la troisième page.
+- `charts.py` mêle graphiques des adhésions et des initiations : à
+  séparer si d'autres graphiques arrivent.
+- `run_sql` n'a pas de paramètres liés : les requêtes sont des f-strings
+  de constantes pour l'instant.

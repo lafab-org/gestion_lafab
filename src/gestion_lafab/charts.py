@@ -3,8 +3,8 @@
 import math
 from dataclasses import dataclass
 
-from gestion_lafab import initiations
 from gestion_lafab.initiations import CATEGORIES
+from gestion_lafab.initiations import Statistics as InitiationStatistics
 from gestion_lafab.membership import MONTHS, Statistics
 
 WIDTH = 720
@@ -205,7 +205,7 @@ def stacked_chart(
 
 
 def monthly_initiation_chart(
-    stats: initiations.Statistics,
+    stats: InitiationStatistics,
 ) -> tuple[Chart, list[StackedBar]]:
     """One bar per month of the current year."""
     rows = {row.month: row for row in stats.monthly[stats.current_year]}
@@ -224,7 +224,7 @@ def monthly_initiation_chart(
 
 
 def annual_initiation_chart(
-    stats: initiations.Statistics,
+    stats: InitiationStatistics,
 ) -> tuple[Chart, list[StackedBar]]:
     """One bar per year, chronologically."""
     bars = []
