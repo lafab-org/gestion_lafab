@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page du rapprochement des initiations — maquette</title>
+<style>
+:root { --text: #0b0b0b; --muted: #52514e; --surface: #fcfcfb; --frame: #d9d8d4; --grid: #e6e5e1; --error: #cf222e; --warn-bg: #fff4d6; }
+body { font-family: system-ui, sans-serif; color: var(--text); background: #f0efec; margin: 0; padding: 1rem; }
+.state { font: 600 0.8rem system-ui; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 2rem auto .5rem; max-width: 60rem; }
+.frame { background: var(--surface); border: 1px solid var(--frame); border-radius: 8px; max-width: 60rem; margin: 0 auto; padding: 1rem 1.5rem 2rem; box-sizing: border-box; }
+.frame h2 { display: inline; margin-right: 1rem; }
+form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; margin: 1rem 0; }
+label { display: flex; flex-direction: column; font-size: .85rem; color: var(--muted); gap: .25rem; }
+.muted { color: var(--muted); } .warn { background: var(--warn-bg); padding: .4rem .6rem; border-radius: 4px; } .error { color: var(--error); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { padding: .3rem .5rem; text-align: left; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+thead th { color: var(--muted); font-weight: 600; }
+tr.incomplete td { background: var(--warn-bg); }
+td.missing::after { content: "à compléter"; color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<p class="state">Avant tout rapprochement</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<input type="file" accept=".json"></label>
+<button type="button">Rapprocher</button></form>
+</div>
+
+<p class="state">Rapprochement en cours</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<span><button type="button">Choisir un fichier</button> Ticket-2026-11-10.json</span></label>
+<button type="button" disabled>Rapprocher</button></form>
+<p class="muted">Rapprochement…</p>
+</div>
+
+<p class="state">Refus</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<span><button type="button">Choisir un fichier</button> Ticket-2026-11-10.json</span></label>
+<button type="button">Rapprocher</button></form>
+<p class="error">Export des tickets illisible.</p>
+</div>
+
+<p class="state">Sans export des tickets</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<input type="file" accept=".json"></label>
+<button type="button">Rapprocher</button></form>
+<p class="warn">Aucun export des tickets envoyé : ventes de la caisse seulement.</p>
+<p>Aucune initiation à ajouter pour octobre 2026.</p>
+</div>
+
+<p class="state">Aucune ligne</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<span><button type="button">Choisir un fichier</button> Ticket-2026-11-10.json</span></label>
+<button type="button">Rapprocher</button></form>
+<p>Aucune initiation à ajouter pour octobre 2026.</p>
+</div>
+
+<p class="state">Lignes à ajouter</p>
+<div class="frame">
+<h2>Rapprochement des initiations</h2><a href="#">Initiations</a>
+<form><label>Mois<input type="month" value="2026-10"></label>
+<label>Export des tickets TiBillet<span><button type="button">Choisir un fichier</button> Ticket-2026-11-10.json</span></label>
+<button type="button">Rapprocher</button></form>
+<p>5 initiations à ajouter pour octobre 2026. <button type="button">Télécharger le CSV</button></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Numéro de membre</th><th>Membre</th><th>Activité</th><th>Date d'inscription</th><th>Source</th><th>E-mail</th><th>Libellé</th><th>Remarque</th></tr></thead>
+<tbody>
+<tr><td>1204</td><td>Camille DURAND</td><td>Initiation soudage électrode enrobée</td><td>03/10/2026</td><td>TiBillet</td><td>camille@example.org</td><td>Initiation au soudage à l’électrode enrobée</td><td></td></tr>
+<tr class="incomplete"><td class="missing"></td><td class="missing"></td><td>Initiation laser</td><td>09/10/2026</td><td>TiBillet</td><td>inconnu@example.org</td><td>Initiation à la découpeuse laser</td><td></td></tr>
+<tr class="incomplete"><td>876</td><td>Alex MARTIN</td><td class="missing"></td><td>14/10/2026</td><td>Caisse</td><td></td><td>Autre initiation en groupe 3h</td><td></td></tr>
+<tr><td>2210</td><td>Sacha PETIT</td><td>Initiation soudage TIG</td><td>21/10/2026</td><td>Caisse</td><td></td><td>Initiation métal TIG 3h</td><td>Quantité 2, payée par Sacha PETIT.</td></tr>
+<tr class="incomplete"><td class="missing"></td><td class="missing"></td><td>Initiation soudage TIG</td><td>21/10/2026</td><td>Caisse</td><td></td><td>Initiation métal TIG 3h</td><td>Quantité 2, payée par Sacha PETIT.</td></tr>
+</tbody></table></div>
+</div>
+</body>
+</html>

@@ -14,9 +14,13 @@ avec les ventes.
    /ui/graphique-annuel-des-initiations,
    /ui/tableau-mensuel-des-initiations, /technical/pile,
    /scenarios/consulter-les-initiations.
-2. Rapprochement, à spécifier : rapprocher les ventes d'initiations
-   (TiBillet, caisse) des inscriptions Paheko, par la date de la
-   séance et non celle de la vente ; demander l'évolution de l'API
-   TiBillet v2.
+2. Rapprochement : /model/categorie-dinitiation,
+   /model/membre, /model/billet, /model/ligne-de-caisse,
+   /model/mot-cle-dactivite, /model/vente-dinitiation,
+   /model/export-des-tickets, /model/rapprochement-des-initiations,
+   /operations/rapprocher-les-initiations,
+   /operations/telecharger-le-rapprochement, /ui/page-des-initiations,
+   /ui/page-du-rapprochement-des-initiations, /technical/pile,
+   /scenarios/preparer-limport-des-initiations.
 
 ## Lessons
