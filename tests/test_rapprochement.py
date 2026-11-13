@@ -164,8 +164,12 @@ def test_free_ticket_selection(client):
                 UNKNOWN,
                 "Réservation",
             ),
-            ticket("Initiation gratuite mois suivant", "01/11/2026 00:00", UNKNOWN, free),
-            ticket("Initiation gratuite mois précédent", "30/09/2026 23:59", UNKNOWN, free),
+            ticket(
+                "Initiation gratuite mois suivant", "01/11/2026 00:00", UNKNOWN, free
+            ),
+            ticket(
+                "Initiation gratuite mois précédent", "30/09/2026 23:59", UNKNOWN, free
+            ),
         ],
     )
     assert sorted(libelles(csv_rows(client))) == [
@@ -178,6 +182,7 @@ def test_free_ticket_selection(client):
 # /operations/rapprocher-les-initiations/produit
 # /operations/rapprocher-les-initiations/billet
 # /operations/telecharger-le-rapprochement/csv
+# /operations/rapprocher-les-initiations/activite
 def test_free_ticket_line(client):
     reconcile(
         client,
