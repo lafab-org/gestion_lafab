@@ -136,6 +136,75 @@ def test_ticket_selection(client):
     assert dates["D fin du mois"] == "31/10/2026"
 
 
+# /operations/rapprocher-les-initiations/produit
+# /operations/rapprocher-les-initiations/billet
+def test_free_ticket_selection(client):
+    free = "Réservation gratuite"
+    reconcile(
+        client,
+        export=[
+            ticket(
+                "Réservée étudiants ENSAS - Initiation laser - Yoann",
+                "16/10/2026 20:00",
+                UNKNOWN,
+                free,
+            ),
+            ticket("Gratuit INITIATION soudure", "15/10/2026 10:00", UNKNOWN, free),
+            ticket("Gratuit réinitiation", "15/10/2026 10:00", UNKNOWN, free),
+            ticket("Adieu Windows", "22/10/2026 19:00", UNKNOWN, free),
+            ticket(
+                "Initiation hors produit gratuit",
+                "15/10/2026 10:00",
+                UNKNOWN,
+                "réservation gratuite",
+            ),
+            ticket(
+                "Initiation gratuite autre produit",
+                "15/10/2026 10:00",
+                UNKNOWN,
+                "Réservation",
+            ),
+            ticket("Initiation gratuite mois suivant", "01/11/2026 00:00", UNKNOWN, free),
+            ticket("Initiation gratuite mois précédent", "30/09/2026 23:59", UNKNOWN, free),
+        ],
+    )
+    assert sorted(libelles(csv_rows(client))) == [
+        "Gratuit INITIATION soudure",
+        "Gratuit réinitiation",
+        "Réservée étudiants ENSAS - Initiation laser - Yoann",
+    ]
+
+
+# /operations/rapprocher-les-initiations/produit
+# /operations/rapprocher-les-initiations/billet
+# /operations/telecharger-le-rapprochement/csv
+def test_free_ticket_line(client):
+    reconcile(
+        client,
+        export=[
+            ticket(
+                "Réservée étudiants ENSAS - Initiation laser - Yoann",
+                "16/10/2026 20:00",
+                ALICE.email,
+                "Réservation gratuite",
+            )
+        ],
+    )
+    assert csv_rows(client) == [
+        [
+            "1204",
+            "Alice ARNAUD",
+            "Initiation laser",
+            "16/10/2026",
+            "Oui",
+            "TiBillet",
+            "alice@example.org",
+            "Réservée étudiants ENSAS - Initiation laser - Yoann",
+            "",
+        ]
+    ]
+
+
 # /operations/rapprocher-les-initiations/membre-vide
 @pytest.mark.parametrize("email", [UNKNOWN, "famille@example.org"])
 def test_ticket_without_member(client, email):
