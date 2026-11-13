@@ -48,3 +48,5 @@
   (`pytest-playwright`, Chromium sans affichage).
 - Vérifications : `uv run pytest`, `uv run ruff check`,
   `uv run ruff format --check`.
+- En fin de phase Tests, `uv run ruff check` et
+  `uv run ruff format --check` passent aussi.
