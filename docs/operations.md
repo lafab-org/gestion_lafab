@@ -79,11 +79,15 @@ Cas :
   Paheko accepte les identifiants et renvoie le résultat des requêtes :
   le Rapprochement des initiations est remplacé par celui du
   mois. Ses lignes :
-  - [billet] une vente par Billet de l'export dont `produit` commence
-    par `Initiation` et `date` est dans le mois : `libelle` son
+  - [billet] une vente par Billet de l'export dont `date` est dans le
+    mois et dont `produit` est une initiation : `libelle` son
     `evenement`, `date` sa `date`, `email` son `email` sans espaces
     autour, `membre` le Membre de même `email`, sans tenir compte de la
     casse ni des espaces autour ;
+    - [produit] un `produit` est une initiation quand il commence par
+      `Initiation`, ou quand il vaut `Réservation gratuite` et que
+      `evenement` contient « initiation » sans tenir compte de la
+      casse ;
     - [membre-vide] billet sans e-mail, ou aucun membre, ou plusieurs,
       avec cet e-mail : `membre` vide ;
   - [caisse] une vente par Ligne de caisse de `categorie`

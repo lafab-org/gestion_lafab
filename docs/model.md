@@ -120,7 +120,7 @@ Un billet TiBillet, lu dans l'Export des tickets.
 - `evenement` : le nom de l'événement (`event_name`).
 - `date` : la date de l'événement (`event_datetime`, `JJ/MM/AAAA HH:MM`).
 - `email` : l'e-mail de la personne (`email`).
-- `produit` : le nom du produit acheté (`product_name`).
+- `produit` : le nom du produit acheté ou réservé (`product_name`).
 
 ## Ligne de caisse
 
@@ -157,7 +157,8 @@ vente :
 
 ## Vente d'initiation
 
-Une initiation payée, par billet TiBillet ou en caisse, que les
+Une initiation payée ou réservée gratuitement, par billet TiBillet ou
+en caisse, que les
 formateurs n'ont pas forcément enregistrée dans Paheko.
 
 - `source` : `TiBillet` ou `Caisse`.
