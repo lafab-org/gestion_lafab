@@ -325,6 +325,71 @@ def test_incomplete_highlighted(server, paheko, page: Page):
     assert without_activity != complete[0]
 
 
+# /ui/page-du-rapprochement-des-initiations/form
+def test_form_labels(server, paheko, page: Page):
+    open_page(page, server)
+    expect(page.get_by_label("Mois")).to_be_editable()
+    expect(page.get_by_label("Export des tickets TiBillet")).to_have_attribute(
+        "type", "file"
+    )
+
+
+def shown_cells(row: Locator) -> list[str]:
+    """The text each cell of a row shows, generated content included."""
+    return row.evaluate(
+        """r => [...r.children].map(e => {
+            const before = getComputedStyle(e, '::before').content;
+            const after = getComputedStyle(e, '::after').content;
+            const generated = c => (c && c !== 'none' && c !== 'normal')
+                ? JSON.parse(c) : '';
+            return (generated(before) + e.textContent + generated(after)).trim();
+        })"""
+    )
+
+
+# /ui/page-du-rapprochement-des-initiations/a-completer
+def test_cells_to_complete(server, paheko, page: Page):
+    setup(paheko)
+    paheko.tabs = TABS + [
+        Tab(
+            "2026-10-20 18:30:00",
+            [("Initiation couture", 1, CASH_INITIATIONS)],
+            name="Groupe lycée",
+        ),
+        Tab("2026-10-21 18:30:00", [("Atelier libre", 1, CASH_INITIATIONS)]),
+    ]
+    open_page(page, server)
+    choose(page, export_bytes(TICKETS))
+    submit(page)
+    expect(
+        page.get_by_text("5 initiations à ajouter pour octobre 2026.")
+    ).to_be_visible()
+    rows = page.get_by_role("table").get_by_role("row")
+    todo = "à compléter"
+    shown = {cells[6]: cells for cells in map(shown_cells, rows.all()[1:])}
+    # Complete line: nothing to complete.
+    assert todo not in shown["Initiation au soudage TIG"]
+    # Ticket without member: number and member to complete.
+    assert shown["Initiation à la découpeuse laser"][:3] == [
+        todo,
+        todo,
+        "Initiation laser",
+    ]
+    # Cash line with member, without activity: activity to complete.
+    assert shown["Autre initiation en groupe 3h"][:3] == ["876", "Bruno MOREAU", todo]
+    # Cash line without member, with the note's name: number only.
+    assert shown["Initiation couture"][:3] == [
+        todo,
+        "Groupe lycée",
+        "Initiation couture",
+    ]
+    # Cash line without member, name nor activity.
+    assert shown["Atelier libre"][:3] == [todo, todo, todo]
+    # Other empty cells are not to complete.
+    assert shown["Autre initiation en groupe 3h"][5] == ""
+    assert shown["Initiation au soudage TIG"][7] == ""
+
+
 # /ui/page-du-rapprochement-des-initiations/download
 def test_download(server, paheko, page: Page):
     setup(paheko)

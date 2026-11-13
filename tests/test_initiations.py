@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import httpx
@@ -16,7 +17,14 @@ from tests.fakes import (
     Clock,
     FakePaheko,
 )
-from tests.stats_html import CATEGORIES, InitiationStats, month_label, sse_html
+from tests.stats_html import (
+    CATEGORIES,
+    InitiationStats,
+    chart_texts,
+    month_label,
+    sse_html,
+    table_rows,
+)
 
 NOW = datetime(2026, 11, 10, 14, 32)
 LASER = DIGITAL[0]
@@ -102,6 +110,14 @@ def test_ok_replaces_reading(paheko):
         (
             lambda p, env: setattr(p, "status", 500),
             f"Réponse inattendue de {URL} : code 500.",
+        ),
+        (
+            lambda p, env: setattr(p, "body", b"pas du JSON"),
+            f"Réponse inattendue de {URL} : code 200.",
+        ),
+        (
+            lambda p, env: setattr(p, "body", b'{"results": "aucun"}'),
+            f"Réponse inattendue de {URL} : code 200.",
         ),
     ],
 )
@@ -308,3 +324,60 @@ def test_table(paheko):
     assert row(stats, 2026, 6) == ["2", "1", "1", "3", "7"]
     assert row(stats, 2026, 7) == ["0", "1", "0", "0", "1"]
     assert row(stats, 2026, 5) == ["0"] * 5
+
+
+def read_html(paheko: FakePaheko, now: datetime = NOW) -> str:
+    app = create_app(dict(ENV), paheko.transport(), Clock(now))
+    with TestClient(app) as client:
+        response = client.get("/initiations/lecture")
+    assert response.status_code == 200
+    return sse_html(response.text)
+
+
+# /ui/graphique-mensuel-des-initiations /ui/graphique-annuel-des-initiations
+# /ui/tableau-mensuel-des-initiations
+def test_titles_before_their_element(paheko):
+    paheko.registrations = initiations((LASER, "2026-03-04"))
+    html = read_html(paheko)
+    monthly = html.index("Initiations par mois en 2026")
+    annual = html.index("Initiations par année")
+    table = re.search(r">\s*Initiations par mois\s*<", html).start()
+    first_svg = html.index("<svg")
+    second_svg = html.index("<svg", first_svg + 1)
+    assert monthly < first_svg < annual < second_svg < table < html.index("<table")
+
+
+# /ui/graphique-mensuel-des-initiations
+def test_monthly_title_follows_current_year(paheko):
+    paheko.registrations = initiations((LASER, "2026-03-04"))
+    html = read_html(paheko, now=datetime(2027, 2, 1, 9, 0))
+    assert "Initiations par mois en 2027" in html
+
+
+# /ui/graphique-mensuel-des-initiations/value
+def test_monthly_values(paheko):
+    paheko.registrations = initiations(
+        *[(LASER, "2026-03-04")] * 4,
+        *[(TIG, "2026-03-20")] * 3,
+        *[(COUTURE, "2026-05-02")] * 11,
+    )
+    texts = chart_texts(read_html(paheko))[0]
+    assert {"7", "11"} <= set(texts)
+
+
+# /ui/graphique-annuel-des-initiations/value
+def test_annual_values(paheko):
+    paheko.registrations = initiations(
+        *[(LASER, "2025-03-04")] * 9,
+        *[(TIG, "2025-06-20")] * 4,
+        *[(COUTURE, "2026-05-02")] * 6,
+    )
+    texts = chart_texts(read_html(paheko))[1]
+    assert {"13", "6"} <= set(texts)
+
+
+# /ui/tableau-mensuel-des-initiations
+def test_table_columns(paheko):
+    paheko.registrations = initiations((LASER, "2026-03-04"))
+    rows = table_rows(read_html(paheko))
+    assert rows[0] == ["Mois", *CATEGORIES, "Total"]

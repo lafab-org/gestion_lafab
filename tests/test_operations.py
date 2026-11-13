@@ -96,3 +96,18 @@ def test_unexpected(paheko, status):
     response = check(dict(ENV), paheko)
     assert f"Réponse inattendue de {URL} : code {status}." in response.text
     assert "Connecté" not in response.text
+
+
+# /operations/etat-initial/vide
+def test_initial_state_nothing_in_memory(paheko):
+    paheko.registrations = [(7, 1, "2026-03-04"), (8, 23, "2026-03-04")]
+    app = create_app(dict(ENV), paheko.transport())
+    with TestClient(app) as client:
+        adhesions = client.get("/adhesions").text
+        initiations = client.get("/initiations").text
+        csv = client.get("/initiations/rapprochement.csv")
+    assert "Données Paheko lues le" not in adhesions
+    assert "Cumul mensuel" not in adhesions
+    assert "Données Paheko lues le" not in initiations
+    assert "Initiations par année" not in initiations
+    assert csv.status_code == 404

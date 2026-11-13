@@ -129,16 +129,24 @@ def run_sql(
     registrations: list[tuple[int, int, str]],
     members: Iterable[Member] = (),
     tabs: Iterable[Tab] = (),
+    labels: dict[int, str | None] | None = None,
 ) -> dict:
     """Run a query of the SQL API on a database holding the data.
 
     registrations: (id_user, id_service, ISO date) rows of services_users.
     members: rows of users; a registered user not among them is added.
     tabs: notes of the cash register.
+    labels: labels of services replacing the default ones; None removes the
+    service.
     """
     db = sqlite3.connect(":memory:")
     db.row_factory = sqlite3.Row
     db.executescript(SCHEMA)
+    for service, label in (labels or {}).items():
+        if label is None:
+            db.execute("DELETE FROM services WHERE id = ?", (service,))
+        else:
+            db.execute("UPDATE services SET label = ? WHERE id = ?", (label, service))
     members = list(members)
     known = {m.id for m in members}
     users = sorted({user for user, _, _ in registrations} - known)
@@ -195,6 +203,9 @@ class FakePaheko:
     held: while True, requests wait before being answered.
     registrations: (id_user, id_service, ISO date) rows of services_users,
     queried by the SQL API, with `members` (users) and `tabs` (cash register).
+    labels: labels of services replacing the default ones; None removes one.
+    body: when set, the body answered with status 200 to accepted credentials,
+    instead of the result of the query.
     """
 
     def __init__(self) -> None:
@@ -205,6 +216,8 @@ class FakePaheko:
         self.registrations: list[tuple[int, int, str]] = []
         self.members: list[Member] = []
         self.tabs: list[Tab] = []
+        self.labels: dict[int, str | None] = {}
+        self.body: bytes | None = None
 
     async def handle(self, request: httpx.Request) -> httpx.Response:
         self.calls += 1
@@ -216,9 +229,15 @@ class FakePaheko:
             return httpx.Response(401, json={"error": "unauthorized"})
         if self.status != 200:
             return httpx.Response(self.status, json={"error": "error"})
+        if self.body is not None:
+            return httpx.Response(200, content=self.body)
         try:
             body = run_sql(
-                request.content.decode(), self.registrations, self.members, self.tabs
+                request.content.decode(),
+                self.registrations,
+                self.members,
+                self.tabs,
+                self.labels,
             )
         except sqlite3.Error as e:
             return httpx.Response(400, json={"error": str(e)})

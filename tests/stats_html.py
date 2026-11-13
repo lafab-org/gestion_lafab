@@ -122,3 +122,43 @@ class InitiationStats:
         """Whether any segment of the monthly chart is shown for that month."""
         pattern = rf"(?:{'|'.join(CATEGORIES)}), {month_label(year, month)} : \d+"
         return re.search(pattern, self.text) is not None
+
+
+class _SvgTexts(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.charts: list[list[str]] = []
+        self._in_svg = False
+        self._in_title = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "svg":
+            self._in_svg = True
+            self.charts.append([])
+        elif tag == "title":
+            self._in_title = True
+
+    def handle_endtag(self, tag):
+        if tag == "svg":
+            self._in_svg = False
+        elif tag == "title":
+            self._in_title = False
+
+    def handle_data(self, data):
+        if self._in_svg and not self._in_title and data.strip():
+            self.charts[-1].append(normalize(data).strip())
+
+
+def chart_texts(html: str) -> list[list[str]]:
+    """For each chart (SVG) of the fragment, in order, the texts it shows,
+    hover texts excluded."""
+    parser = _SvgTexts()
+    parser.feed(html)
+    return parser.charts
+
+
+def table_rows(html: str) -> list[list[str]]:
+    """The rows of the tables of the fragment, header rows included."""
+    parser = _Parser()
+    parser.feed(html)
+    return parser.rows

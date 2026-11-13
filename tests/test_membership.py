@@ -6,7 +6,7 @@ from litestar.testing import TestClient
 
 from gestion_lafab.app import create_app
 from tests.fakes import ENV, MEMBERSHIP, OTHER_SERVICE, URL, Clock, FakePaheko
-from tests.stats_html import Stats, sse_html
+from tests.stats_html import Stats, chart_texts, sse_html, table_rows
 
 NOW = datetime(2026, 11, 10, 14, 32)
 
@@ -91,6 +91,14 @@ def test_ok_replaces_reading(paheko):
         (
             lambda p, env: setattr(p, "status", 500),
             f"Réponse inattendue de {URL} : code 500.",
+        ),
+        (
+            lambda p, env: setattr(p, "body", b"pas du JSON"),
+            f"Réponse inattendue de {URL} : code 200.",
+        ),
+        (
+            lambda p, env: setattr(p, "body", b'{"results": "aucun"}'),
+            f"Réponse inattendue de {URL} : code 200.",
         ),
     ],
 )
@@ -202,6 +210,32 @@ def test_doublon_measured_from_counted_adhesion(paheko):
     )
     _, stats = read(paheko)
     assert stats.monthly[2025][:3] == ["1", "1", "0"]
+
+
+# /model/adhesion/doublon /model/adhesion/meme-date
+def test_doublon_same_date(paheko):
+    paheko.registrations = adhesions("2025-04-10", "2025-04-10", user=7)
+    _, stats = read(paheko)
+    assert month_count(stats, 2025, 4) == "1"
+
+
+# /model/adhesion/doublon /model/adhesion/meme-date
+def test_doublon_same_date_after_counted(paheko):
+    # 04-01 counts; both 04-10 are doublons of it.
+    paheko.registrations = adhesions("2025-04-01", "2025-04-10", "2025-04-10", user=7)
+    _, stats = read(paheko)
+    assert month_count(stats, 2025, 4) == "1"
+
+
+# /model/adhesion/doublon /model/adhesion/meme-date
+def test_doublon_same_date_after_old(paheko):
+    # 03-01 counts; 40 days later, one of the two 04-10 counts.
+    paheko.registrations = adhesions(
+        "2025-03-01", "2025-04-10", "2025-04-10", "2025-04-20", user=7
+    )
+    _, stats = read(paheko)
+    assert month_count(stats, 2025, 3) == "1"
+    assert month_count(stats, 2025, 4) == "1"
 
 
 # /model/adhesion/doublon
@@ -341,3 +375,74 @@ def test_indicator_no_previous(paheko):
         "2026 : 1 adhésions au 10 novembre, — par rapport à 2025"
         " à la même date (0)." in stats.text
     )
+
+
+# /model/statistiques-des-adhesions/29-fevrier /ui/indicateur/text
+def test_indicator_29_february(paheko):
+    paheko.registrations = adhesions(
+        "2027-01-05", "2027-02-28", "2027-03-01", "2028-01-10", "2028-02-29",
+    )  # fmt: skip
+    _, stats = read(paheko, now=datetime(2028, 2, 29, 12, 0))
+    assert (
+        "2028 : 2 adhésions au 29 février, 0 % par rapport à 2027"
+        " à la même date (2)." in stats.text
+    )
+
+
+def read_html(paheko: FakePaheko, now: datetime = NOW) -> str:
+    app = create_app(dict(ENV), paheko.transport(), Clock(now))
+    with TestClient(app) as client:
+        response = client.get("/adhesions/lecture")
+    assert response.status_code == 200
+    return sse_html(response.text)
+
+
+# /ui/graphique-du-cumul /ui/graphique-annuel /ui/tableau-mensuel
+def test_titles_before_their_element(paheko):
+    paheko.registrations = adhesions("2025-03-04")
+    html = read_html(paheko)
+    cumul = html.index("Cumul mensuel")
+    annual = html.index("Total annuel")
+    table = html.index("Adhésions par mois")
+    first_svg = html.index("<svg")
+    second_svg = html.index("<svg", first_svg + 1)
+    assert cumul < first_svg < annual < second_svg < table < html.index("<table")
+
+
+# /ui/graphique-du-cumul/legend
+def test_cumulative_legend(paheko):
+    paheko.registrations = adhesions("2025-03-04")
+    stats = Stats(read_html(paheko))
+    assert "2026 2025 2016 à 2024" in stats.text
+
+
+# /ui/graphique-du-cumul/legend
+def test_cumulative_legend_follows_current_year(paheko):
+    paheko.registrations = adhesions("2025-03-04")
+    stats = Stats(read_html(paheko, now=datetime(2027, 1, 5, 9, 0)))
+    assert "2027 2026 2016 à 2025" in stats.text
+
+
+# /ui/graphique-du-cumul/year-label
+def test_cumulative_year_labels(paheko):
+    paheko.registrations = adhesions("2025-03-04", "2026-01-15")
+    texts = chart_texts(read_html(paheko))[0]
+    assert "2026" in texts
+    assert "2025" in texts
+
+
+# /ui/graphique-annuel/value
+def test_annual_values(paheko):
+    paheko.registrations = adhesions("2025-01-10", "2025-03-10", "2026-04-01")
+    texts = chart_texts(read_html(paheko))[1]
+    # 2018: 257 in the history; 2025: 2; 2026: 1.
+    assert {"257", "2", "1"} <= set(texts)
+
+
+# /ui/tableau-mensuel
+def test_table_columns(paheko):
+    paheko.registrations = adhesions("2025-03-04")
+    rows = table_rows(read_html(paheko))
+    assert rows[0][0] == "Année"
+    assert rows[0][-1] == "Total"
+    assert len(rows[0]) == 14
