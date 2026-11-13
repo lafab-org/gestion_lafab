@@ -38,10 +38,14 @@ contient des initiations de l'année en cours.
 
 ## Préparer l'import des initiations
 
-Le fichier `.env` contient des identifiants Paheko valides ; en
-octobre, un billet TiBillet d'initiation laser d'un membre sans
-inscription Paheko, et une vente en caisse « Autre initiation en groupe
-3h ».
+Le fichier `.env` contient des identifiants Paheko valides ; on est
+en novembre 2026. Les seules ventes d'initiation d'octobre sont :
+- dans l'export des tickets de TiBillet, un billet de produit
+  `Initiation` pour l'événement « Initiation à la découpeuse laser »,
+  à l'e-mail d'un seul membre, sans inscription Paheko à l'initiation
+  laser à cette date ;
+- en caisse, une ligne « Autre initiation en groupe 3h » de catégorie
+  « D - Initiations » et de quantité 1.
 
 - Depuis la Page des initiations, l'utilisateur clique sur
   `Rapprochement`.

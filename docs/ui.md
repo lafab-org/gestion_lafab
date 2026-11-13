@@ -79,25 +79,33 @@ Les Statistiques des adhésions, de haut en bas :
 
 ## Graphique du cumul
 
-Une courbe par année : `cumul` à chaque mois, de janvier à décembre.
+Le titre `Cumul mensuel`, puis une courbe par année : `cumul` à chaque
+mois, de janvier à décembre.
 
 - [current] L'année en cours, d'une couleur vive, s'arrête au mois de
   la lecture.
 - [previous] L'année précédente, d'une seconde couleur.
 - [older] Les autres années, en gris clair.
+- [legend] Une légende : l'année en cours, l'année précédente, puis
+  `<première année> à <année en cours − 2>`.
+- [year-label] Le nom de l'année au bout des courbes de l'année en
+  cours et de l'année précédente.
 - [hover] Survol d'un point : `<année>, <mois> : <cumul>`.
 
 ## Graphique annuel
 
-Une barre par année, dans l'ordre chronologique : `total`.
+Le titre `Total annuel`, puis une barre par année, dans l'ordre
+chronologique : `total`.
 
+- [value] Le `total` au-dessus de chaque barre.
 - [partial] La barre de l'année en cours est marquée comme partielle.
 - [hover] Survol d'une barre : `<année> : <total>`.
 
 ## Tableau mensuel
 
-Une ligne par année, de la plus récente à la plus ancienne ; une
-colonne par mois, de janvier à décembre, puis `Total`.
+Le titre `Adhésions par mois`, puis une ligne par année, de la plus
+récente à la plus ancienne ; une colonne `Année`, une colonne par mois,
+de janvier à décembre, puis `Total`.
 
 - [cells] Chaque case : `mensuel` de l'année et du mois ; vide pour un
   mois sans nombre.
@@ -133,25 +141,29 @@ Les Statistiques des initiations, de haut en bas :
 
 ## Graphique mensuel des initiations
 
-Une barre par mois de l'année en cours, de janvier à décembre,
-empilant `mensuel` par catégorie.
+Le titre `Initiations par mois en <année en cours>`, puis une barre
+par mois de l'année en cours, de janvier à décembre, empilant
+`mensuel` par catégorie.
 
+- [value] La somme des catégories du mois au-dessus de chaque barre.
 - [future] Mois après celui de la lecture : aucune barre.
 - [hover] Survol d'un segment : `<catégorie>, <mois> <année> : <n>`.
 
 ## Graphique annuel des initiations
 
-Une barre par année, dans l'ordre chronologique, empilant `total` par
-catégorie.
+Le titre `Initiations par année`, puis une barre par année, dans
+l'ordre chronologique, empilant `total` par catégorie.
 
+- [value] La somme des catégories de l'année au-dessus de chaque barre.
 - [partial] La barre de l'année en cours est marquée comme partielle.
 - [hover] Survol d'un segment : `<catégorie>, <année> : <n>`.
 
 ## Tableau mensuel des initiations
 
-Une ligne par mois, du mois de la lecture à janvier de la première
-année, `<mois> <année>` ; une colonne par catégorie, dans l'ordre
-bois, métal, souple, numérique, puis `Total`.
+Le titre `Initiations par mois`, puis une ligne par mois, du mois de
+la lecture à janvier de la première année, `<mois> <année>` ; une
+colonne `Mois`, une colonne par catégorie, dans l'ordre bois, métal,
+souple, numérique, puis `Total`.
 
 - [cells] Chaque case : `mensuel` du mois et de la catégorie.
 - [total] Colonne `Total` : la somme des catégories du mois.
@@ -164,9 +176,9 @@ bois, métal, souple, numérique, puis `Total`.
 Affiche, de haut en bas :
 - [title] le titre `Rapprochement des initiations`, et un lien
   `Initiations` vers la Page des initiations ;
-- [form] le choix du mois, le mois précédent celui du jour à
-  l'ouverture, le choix du fichier de l'Export des tickets, et un
-  bouton `Rapprocher` ;
+- [form] le choix du mois, intitulé `Mois`, le mois précédent celui du
+  jour à l'ouverture, le choix du fichier de l'Export des tickets,
+  intitulé `Export des tickets TiBillet`, et un bouton `Rapprocher` ;
 - [result] le résultat :
   - [empty] avant tout rapprochement depuis l'ouverture de la page :
     rien ;
@@ -180,7 +192,10 @@ Affiche, de haut en bas :
     rapprochement, avec les colonnes du CSV sauf `Payé ?`.
     - [incomplete] Une ligne sans membre ou sans activité est mise en
       évidence.
-  - [caisse-seule] après un rapprochement sans fichier envoyé, avant le
+    - [a-completer] Une case vide de `Numéro de membre` ou de `Membre`
+      d'une ligne sans membre, ou d'`Activité` d'une ligne sans
+      activité : `à compléter`.
+  - [caisse-seule] après un rapprochement réussi sans fichier envoyé, avant le
     résultat, un avertissement :
     `Aucun export des tickets envoyé : ventes de la caisse seulement.`
 

@@ -1,5 +1,13 @@
 # Modèle
 
+## État
+
+Ce que l'application garde en mémoire tant qu'elle tourne.
+
+- `lecture_paheko` : la Lecture Paheko, ou aucune.
+- `lecture_initiations` : la Lecture des initiations, ou aucune.
+- `rapprochement` : le Rapprochement des initiations, ou aucun.
+
 ## Adhésion
 
 Une inscription d'un membre à l'activité `- Adhésion` de Paheko
@@ -9,7 +17,11 @@ Une inscription d'un membre à l'activité `- Adhésion` de Paheko
 - `date` : la date de l'inscription.
 
 - [doublon] Une adhésion est un doublon si une adhésion du même membre
-  qui n'est pas un doublon la précède de moins de 30 jours.
+  qui n'est pas un doublon la précède de moins de 30 jours ou a la même
+  date.
+  - [meme-date] De plusieurs adhésions du même membre à la même date
+    qu'aucune adhésion du membre qui n'est pas un doublon ne précède de
+    moins de 30 jours, exactement une n'est pas un doublon.
 
 ## Historique des adhésions
 
@@ -18,8 +30,7 @@ où Paheko est incomplet : 2016 à 2022.
 
 ## Lecture Paheko
 
-Les adhésions lues dans Paheko, gardées en mémoire tant que
-l'application tourne.
+Les adhésions lues dans Paheko.
 
 - `adhesions` : les adhésions datées à partir du 1er janvier de
   l'année qui suit la dernière année de l'Historique des adhésions.
@@ -35,16 +46,18 @@ l'année de `jour`, l'année en cours.
 - `mensuel` : pour chaque année et chaque mois, le nombre
   d'adhésions.
   - [historique] Année de l'historique : le nombre de l'historique.
-  - [paheko] Autre année : le nombre d'adhésions de la lecture datées
-    de ce mois, doublons exclus.
   - [futur] Mois de l'année en cours après celui de `jour` : aucun
     nombre.
+  - [paheko] Tout autre mois d'une année hors de l'historique : le nombre d'adhésions de la
+    lecture datées de ce mois, doublons exclus.
 - `cumul` : pour chaque année et chaque mois, la somme de `mensuel`
   de janvier à ce mois.
 - `total` : pour chaque année, la somme de `mensuel`.
 - `a_date` : le nombre d'adhésions de l'année en cours jusqu'à `jour`
   inclus, et celui de l'année précédente jusqu'au même jour et mois
   inclus, doublons exclus.
+  - [29-fevrier] `jour` un 29 février : l'année précédente jusqu'au
+    28 février inclus.
 
 ## Catégorie d'initiation
 
@@ -73,8 +86,7 @@ d'initiation.
 
 ## Lecture des initiations
 
-Les initiations lues dans Paheko, gardées en mémoire tant que
-l'application tourne.
+Les initiations lues dans Paheko.
 
 - `initiations` : les initiations datées jusqu'à `jour` inclus.
 - `instant` : la date et l'heure de la lecture.
@@ -121,6 +133,10 @@ Une ligne d'une note de la caisse Paheko.
 - `membre` : le Membre lié à la note, ou aucun.
 - `nom` : le nom de la note.
 
+## Libellé d'activité
+
+Le libellé, dans Paheko, d'une activité de la Catégorie d'initiation.
+
 ## Mot-clé d'activité
 
 Un texte qui désigne une activité d'initiation dans le libellé d'une
@@ -166,3 +182,5 @@ faire relire par les formateurs puis importer dans Paheko.
 - `mois` : le mois choisi.
 - `lignes` : les Ventes d'initiation, dans l'ordre du fichier à
   importer.
+- `libelles` : le Libellé d'activité de chaque activité, lu dans
+  Paheko au moment du rapprochement.
