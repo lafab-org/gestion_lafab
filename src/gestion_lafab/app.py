@@ -1,3 +1,4 @@
+import re
 from collections.abc import AsyncIterator, Callable, Mapping
 from datetime import datetime
 from html import escape
@@ -46,10 +47,10 @@ def previous_month(day: datetime) -> tuple[int, int]:
 
 def parse_month(value: object, default: tuple[int, int]) -> tuple[int, int]:
     """`AAAA-MM` from the month input; the default if it is not one."""
-    try:
-        year, month = (int(part) for part in str(value).split("-"))
-    except ValueError:
+    match = re.fullmatch(r"([0-9]{4})-([0-9]{2})", str(value))
+    if match is None:
         return default
+    year, month = int(match[1]), int(match[2])
     return (year, month) if 1 <= month <= 12 and 1 <= year <= 9999 else default
 
 

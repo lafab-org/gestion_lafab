@@ -4,6 +4,7 @@ import csv
 import email.policy
 import io
 import json
+import re
 import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -22,6 +23,7 @@ CASH_CATEGORY = 5
 CASH_CATEGORY_NAME = "D - Initiations"
 TICKET_FIELDS = ("event_name", "event_datetime", "email", "product_name")
 TICKET_DATETIME = "%d/%m/%Y %H:%M"
+TICKET_DATETIME_SHAPE = re.compile(r"[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}")
 
 # Keywords of each activity of initiation, as written in a sale's label.
 KEYWORDS = {
@@ -193,8 +195,10 @@ def parse_export(content: bytes) -> list[Ticket] | None:
             isinstance(item.get(f), str) for f in TICKET_FIELDS
         ):
             return None
+        if not TICKET_DATETIME_SHAPE.fullmatch(item["event_datetime"]):
+            return None
         try:
-            when = datetime.strptime(item["event_datetime"].strip(), TICKET_DATETIME)
+            when = datetime.strptime(item["event_datetime"], TICKET_DATETIME)
         except ValueError:
             return None
         tickets.append(
@@ -275,9 +279,9 @@ async def reconcile(
     if tickets is not None:
         by_email: dict[str, list[Member]] = {}
         for r in rows["members"]:
-            by_email.setdefault(str(r["email"]).strip().casefold(), []).append(
-                to_member(r)
-            )
+            key = str(r["email"]).strip().casefold()
+            if key:
+                by_email.setdefault(key, []).append(to_member(r))
         for t in tickets:
             if not t.product.startswith("Initiation"):
                 continue
