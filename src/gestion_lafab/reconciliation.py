@@ -229,6 +229,12 @@ def month_bounds(year: int, month: int) -> tuple[str, str]:
     return f"{year:04d}-{month:02d}-01", f"{following[0]:04d}-{following[1]:02d}-01"
 
 
+def is_initiation(t: Ticket) -> bool:
+    return t.product.startswith("Initiation") or (
+        t.product == "Réservation gratuite" and "initiation" in t.event.casefold()
+    )
+
+
 async def reconcile(
     env: Mapping[str, str],
     transport: httpx.AsyncBaseTransport | None,
@@ -283,7 +289,7 @@ async def reconcile(
             if key:
                 by_email.setdefault(key, []).append(to_member(r))
         for t in tickets:
-            if not t.product.startswith("Initiation"):
+            if not is_initiation(t):
                 continue
             if (t.day.year, t.day.month) != (year, month):
                 continue
