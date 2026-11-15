@@ -108,17 +108,13 @@ def test_ticket_selection(client):
             ticket("C début du mois", "01/10/2026 00:00", UNKNOWN),
             ticket("D fin du mois", "31/10/2026 23:30", UNKNOWN),
             ticket(
-                "Réservation gratuite",
+                "E réservation gratuite",
                 "15/10/2026 10:00",
                 UNKNOWN,
                 "Réservation gratuite",
             ),
-            ticket(
-                "Produit qui ne commence pas",
-                "15/10/2026 10:00",
-                UNKNOWN,
-                "Atelier Initiation",
-            ),
+            ticket("F autre produit", "15/10/2026 10:00", UNKNOWN, "Atelier couture"),
+            ticket("G adhésion", "15/10/2026 10:00", UNKNOWN, "Adhésion"),
             ticket("Mois précédent", "30/09/2026 23:59", UNKNOWN),
             ticket("Mois suivant", "01/11/2026 00:00", UNKNOWN),
             ticket("Année précédente", "15/10/2025 10:00", UNKNOWN),
@@ -130,56 +126,25 @@ def test_ticket_selection(client):
         "B produit Initiation tock",
         "C début du mois",
         "D fin du mois",
+        "E réservation gratuite",
+        "F autre produit",
+        "G adhésion",
     ]
     dates = {row[7]: row[3] for row in rows}
     assert dates["C début du mois"] == "01/10/2026"
     assert dates["D fin du mois"] == "31/10/2026"
 
 
-# /operations/rapprocher-les-initiations/produit
-# /operations/rapprocher-les-initiations/billet
-def test_free_ticket_selection(client):
-    free = "Réservation gratuite"
-    reconcile(
-        client,
-        export=[
-            ticket(
-                "Réservée étudiants ENSAS - Initiation laser - Yoann",
-                "16/10/2026 20:00",
-                UNKNOWN,
-                free,
-            ),
-            ticket("Gratuit INITIATION soudure", "15/10/2026 10:00", UNKNOWN, free),
-            ticket("Gratuit réinitiation", "15/10/2026 10:00", UNKNOWN, free),
-            ticket("Adieu Windows", "22/10/2026 19:00", UNKNOWN, free),
-            ticket(
-                "Initiation hors produit gratuit",
-                "15/10/2026 10:00",
-                UNKNOWN,
-                "réservation gratuite",
-            ),
-            ticket(
-                "Initiation gratuite autre produit",
-                "15/10/2026 10:00",
-                UNKNOWN,
-                "Réservation",
-            ),
-            ticket(
-                "Initiation gratuite mois suivant", "01/11/2026 00:00", UNKNOWN, free
-            ),
-            ticket(
-                "Initiation gratuite mois précédent", "30/09/2026 23:59", UNKNOWN, free
-            ),
-        ],
-    )
-    assert sorted(libelles(csv_rows(client))) == [
-        "Gratuit INITIATION soudure",
-        "Gratuit réinitiation",
-        "Réservée étudiants ENSAS - Initiation laser - Yoann",
-    ]
+# /operations/rapprocher-les-initiations/billet /model/billet
+# /operations/rapprocher-les-initiations/export
+def test_ticket_without_product(client):
+    without = ticket("Sans produit", "15/10/2026 10:00", UNKNOWN)
+    del without["product_name"]
+    response = reconcile(client, export=[without])
+    assert "illisible" not in text(response)
+    assert libelles(csv_rows(client)) == ["Sans produit"]
 
 
-# /operations/rapprocher-les-initiations/produit
 # /operations/rapprocher-les-initiations/billet
 # /operations/telecharger-le-rapprochement/csv
 # /operations/rapprocher-les-initiations/activite
@@ -801,7 +766,6 @@ for field, value in [
     ("event_name", 42),
     ("event_datetime", None),
     ("email", ["alice@example.org"]),
-    ("product_name", {"name": "Initiation"}),
 ]:
     wrong = ticket("Initiation laser", "09/10/2026 18:00", UNKNOWN)
     wrong[field] = value
@@ -829,14 +793,10 @@ for when in [
     )
 INCOMPLETE = [
     (field, ticket("Initiation laser", "09/10/2026 18:00", UNKNOWN))
-    for field in ["event_name", "event_datetime", "email", "product_name"]
+    for field in ["event_name", "event_datetime", "email"]
 ] + [
-    # Tickets the month or the product would leave out.
+    # Tickets the month would leave out.
     ("email", ticket("Initiation laser", "09/09/2026 18:00", UNKNOWN)),
-    (
-        "event_name",
-        ticket("Réservation", "09/10/2026 18:00", UNKNOWN, "Réservation gratuite"),
-    ),
 ]
 for missing, incomplete in INCOMPLETE:
     del incomplete[missing]
