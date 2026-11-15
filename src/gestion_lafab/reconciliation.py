@@ -21,7 +21,7 @@ from gestion_lafab.paheko import run_sql
 UNREADABLE = "Export des tickets illisible."
 CASH_CATEGORY = 5
 CASH_CATEGORY_NAME = "D - Initiations"
-TICKET_FIELDS = ("event_name", "event_datetime", "email", "product_name")
+TICKET_FIELDS = ("event_name", "event_datetime", "email")
 TICKET_DATETIME = "%d/%m/%Y %H:%M"
 TICKET_DATETIME_SHAPE = re.compile(r"[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}")
 
@@ -88,7 +88,6 @@ class Ticket:
     event: str
     day: date
     email: str
-    product: str
 
 
 @dataclass(frozen=True)
@@ -206,7 +205,6 @@ def parse_export(content: bytes) -> list[Ticket] | None:
                 item["event_name"],
                 when.date(),
                 item["email"].strip(),
-                item["product_name"],
             )
         )
     return tickets
@@ -227,12 +225,6 @@ def month_bounds(year: int, month: int) -> tuple[str, str]:
     """ISO dates of the first day of the month and of the next month."""
     following = (year + 1, 1) if month == 12 else (year, month + 1)
     return f"{year:04d}-{month:02d}-01", f"{following[0]:04d}-{following[1]:02d}-01"
-
-
-def is_initiation(t: Ticket) -> bool:
-    return t.product.startswith("Initiation") or (
-        t.product == "Réservation gratuite" and "initiation" in t.event.casefold()
-    )
 
 
 async def reconcile(
@@ -289,8 +281,6 @@ async def reconcile(
             if key:
                 by_email.setdefault(key, []).append(to_member(r))
         for t in tickets:
-            if not is_initiation(t):
-                continue
             if (t.day.year, t.day.month) != (year, month):
                 continue
             found = by_email.get(t.email.casefold(), [])
