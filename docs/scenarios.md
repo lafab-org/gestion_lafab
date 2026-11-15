@@ -40,8 +40,7 @@ contient des initiations de l'année en cours.
 
 Le fichier `.env` contient des identifiants Paheko valides ; on est
 en novembre 2026. Les seules ventes d'initiation d'octobre sont :
-- dans l'export des tickets de TiBillet, un billet de produit
-  `Initiation` pour l'événement « Initiation à la découpeuse laser »,
+- dans l'export des tickets de TiBillet, un billet pour l'événement « Initiation à la découpeuse laser »,
   à l'e-mail d'un seul membre, sans inscription Paheko à l'initiation
   laser à cette date ;
 - en caisse, une ligne « Autre initiation en groupe 3h » de catégorie
