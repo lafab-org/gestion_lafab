@@ -91,6 +91,8 @@ Les initiations lues dans Paheko.
 - `initiations` : les initiations datées jusqu'à `jour` inclus.
 - `instant` : la date et l'heure de la lecture.
 - `jour` : la date de `instant`, le dernier jour des statistiques.
+- `libelles` : le Libellé d'activité de chaque activité, lu dans
+  Paheko au moment de la lecture.
 
 ## Statistiques des initiations
 
@@ -104,6 +106,24 @@ cours ; l'année en cours seule s'il n'y a aucune initiation.
     nombre.
 - `total` : pour chaque année et chaque catégorie, la somme de
   `mensuel`.
+
+## Doublons d'initiation
+
+Calculés à partir de la Lecture des initiations.
+
+- `doublons` : les paires de deux de ses initiations qui forment un
+  doublon, chacune avec :
+  - `membre` : leur membre ;
+  - `activite` : leur activité ;
+  - `premiere`, `seconde` : les dates de la plus ancienne et de la plus
+    récente.
+  - [écart] Deux initiations du même membre et de la même activité
+    forment un doublon quand la plus récente est datée strictement
+    avant le même jour de l'année suivant la plus ancienne ; deux
+    initiations à la même date en forment un. Le jour qui suit d'un an
+    un 29 février est libre.
+  - [paires] Chaque paire forme son propre doublon, même quand plus de
+    deux initiations du même membre à la même activité se suivent.
 
 ## Membre
 

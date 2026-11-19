@@ -35,6 +35,8 @@ th, td { padding: .3rem .5rem; text-align: right; border-bottom: 1px solid var(-
 thead th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
 tbody th, thead th:first-child { text-align: left; font-weight: 400; }
 td.total { font-weight: 600; }
+table.doublons { width: auto; }
+table.doublons tbody th { padding-right: 1.5rem; }
 button { margin: .5rem 0; }
 </style>
 </head>
@@ -239,6 +241,22 @@ button { margin: .5rem 0; }
 <tr><th>février 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
 <tr><th>janvier 2019</th><td>0</td><td>0</td><td>0</td><td>0</td><td class="total">0</td></tr>
 </tbody></table></div>
+<h3>Doublons</h3>
+<div class="tablewrap"><table class="doublons"><thead><tr><th>Membre</th><th>Activité</th><th>Première</th><th>Seconde</th></tr></thead><tbody>
+<tr><th>412 Camille Martin</th><th>Initiation laser</th><td>14/10/2026</td><td>14/10/2026</td></tr>
+<tr><th>87 Sacha Bernard</th><th>Initiation soudage TIG</th><td>03/02/2026</td><td>21/06/2026</td></tr>
+<tr><th>305 Lou Petit</th><th>Initiation couture</th><td>19/11/2025</td><td>05/03/2026</td></tr>
+</tbody></table></div>
+</div>
+
+<p class="state">Données lues — aucun doublon</p>
+<div class="frame">
+<h2>Initiations</h2><a href="#">Accueil</a>
+<p class="read">Données Paheko lues le 10/11/2026 à 14 h 32.</p>
+<button>Actualiser</button> <a href="#">Rapprochement</a>
+<p class="read">(graphiques et tableau mensuel)</p>
+<h3>Doublons</h3>
+<p>Aucun doublon.</p>
 </div>
 
 <p class="state">Première ouverture — lecture en cours</p>
@@ -253,7 +271,7 @@ button { margin: .5rem 0; }
 <h2>Initiations</h2><a href="#">Accueil</a>
 <p class="error">Impossible de joindre https://lafab.paheko.cloud.</p>
 <button>Actualiser</button> <a href="#">Rapprochement</a>
-<p class="read">(graphiques et tableau inchangés)</p>
+<p class="read">(graphiques, tableau mensuel et doublons inchangés)</p>
 </div>
 </body>
 </html>

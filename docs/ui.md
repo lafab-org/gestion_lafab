@@ -123,7 +123,9 @@ Affiche, de haut en bas :
 - [rapprochement-link] un lien `Rapprochement` vers la Page du
   rapprochement des initiations ;
 - [stats] les Statistiques des initiations affichées, si une Lecture
-  des initiations est en mémoire.
+  des initiations est en mémoire ;
+- [doublons] le Tableau des doublons d'initiation, si une Lecture des
+  initiations est en mémoire.
 
 Actions :
 - [refresh-click] Clic sur `Actualiser` : lance
@@ -167,6 +169,21 @@ souple, numérique, puis `Total`.
 
 - [cells] Chaque case : `mensuel` du mois et de la catégorie.
 - [total] Colonne `Total` : la somme des catégories du mois.
+
+## Tableau des doublons d'initiation
+
+Le titre `Doublons`, puis une ligne par doublon des Doublons
+d'initiation ; les colonnes `Membre`, `Activité`, `Première`,
+`Seconde`.
+
+- [ordre] Les lignes de la `seconde` la plus récente à la plus
+  ancienne ; l'ordre des doublons de même `seconde` est libre.
+- [membre] Colonne `Membre` : `<numéro> <nom>` du membre.
+- [activite] Colonne `Activité` : le libellé de l'activité, dans
+  `libelles` de la Lecture des initiations ; vide sans libellé lu.
+- [dates] Colonnes `Première` et `Seconde` : `premiere` et `seconde`,
+  `<jj/mm/aaaa>`.
+- [aucun] Aucun doublon : `Aucun doublon.` à la place des lignes.
 
 ## Page du rapprochement des initiations
 
