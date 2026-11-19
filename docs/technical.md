@@ -3,7 +3,8 @@
 ## Pile
 
 - Python 3.13, géré avec uv.
-- Serveur : Litestar, gabarits Jinja2. Écoute sur `127.0.0.1:8000`.
+- Serveur : Litestar, gabarits Jinja2. Écoute sur `127.0.0.1`, au port
+  `PORT`.
 - Pages : HTML rendu par le serveur, interactivité avec Datastar. Le
   fichier JavaScript de Datastar est servi par l'application.
 - Accès aux API : httpx.
@@ -33,6 +34,9 @@
 - La configuration est lue dans un fichier `.env` du répertoire de
   travail, hors de git : `PAHEKO_URL`, `PAHEKO_API_ID`,
   `PAHEKO_API_TOKEN`.
+- `PORT`, facultative, lue de la même façon : le port d'écoute, 8000
+  si elle est absente ou vide. Une valeur qui n'est pas un port : le
+  comportement est libre.
 
 ## Conventions
 
@@ -51,9 +55,10 @@
   - interface : l'application servie, pilotée dans un navigateur avec
     Playwright (`pytest-playwright`, Chromium sans affichage) ; ils
     observent ce que les pages affichent et les fichiers téléchargés ;
-  - scénarios : l'application lancée par sa commande, Paheko simulé
-    par un serveur HTTP, pilotée dans un navigateur ; ils observent ce
-    que voit l'utilisateur, de bout en bout.
+  - scénarios : l'application lancée par sa commande sur un port
+    libre, Paheko simulé par un serveur HTTP, pilotée dans un
+    navigateur ; ils observent ce que voit l'utilisateur, de bout en
+    bout.
 - Vérifications : `uv run pytest`, `uv run ruff check`,
   `uv run ruff format --check`.
 - En fin de phase Tests, `uv run ruff check` et
