@@ -384,3 +384,39 @@ def test_annual_partial(server, paheko, page: Page):
     assert current != previous
     assert current != older
     assert previous == older
+
+
+# /ui/page-des-initiations/doublons /ui/tableau-des-doublons-dinitiation
+def test_duplicates_after_statistics(server, paheko, page: Page):
+    paheko.registrations = [*REGISTRATIONS, (1, WOOD[0], "2026-03-02")]
+    open_page(page, server)
+    expect(page.get_by_text(READ)).to_be_visible()
+    title = page.get_by_role("heading", name="Doublons", exact=True)
+    expect(title).to_be_visible()
+    monthly_table = page.get_by_role("heading", name="Initiations par mois", exact=True)
+    assert title.bounding_box()["y"] > monthly_table.bounding_box()["y"]
+    assert title.bounding_box()["y"] > annual(page).bounding_box()["y"]
+    line = page.get_by_role("row").filter(has_text="02/03/2026")
+    expect(line).to_have_count(1)
+    assert line.bounding_box()["y"] > title.bounding_box()["y"]
+
+
+# /ui/page-des-initiations/doublons
+def test_no_duplicates_without_reading(server, paheko, page: Page):
+    paheko.status = 403
+    open_page(page, server)
+    expect(page.get_by_text(f"Identifiants refusés par {URL}.")).to_be_visible()
+    expect(page.get_by_role("heading", name="Doublons")).to_have_count(0)
+    expect(page.get_by_text("Aucun doublon.")).to_have_count(0)
+
+
+# /ui/page-des-initiations/doublons /ui/statut-de-lecture/failed
+def test_failed_refresh_keeps_duplicates(server, paheko, page: Page):
+    paheko.registrations = [*REGISTRATIONS, (1, WOOD[0], "2026-03-02")]
+    open_page(page, server)
+    expect(page.get_by_text(READ)).to_be_visible()
+    paheko.status = 500
+    page.get_by_role("button", name="Actualiser").click()
+    expect(page.get_by_text(f"Réponse inattendue de {URL} : code 500.")).to_be_visible()
+    expect(page.get_by_role("heading", name="Doublons", exact=True)).to_be_visible()
+    expect(page.get_by_role("row").filter(has_text="02/03/2026")).to_have_count(1)
