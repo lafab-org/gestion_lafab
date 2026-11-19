@@ -47,6 +47,12 @@ def monthly(page: Page) -> Locator:
     return svg_with_title(page, r"^\S+, mars 2026 : \d+$")
 
 
+def monthly_table(page: Page) -> Locator:
+    """The Tableau mensuel des initiations, by its `Mois` column."""
+    mois = page.get_by_role("columnheader", name="Mois", exact=True)
+    return page.get_by_role("table").filter(has=mois)
+
+
 def annual(page: Page) -> Locator:
     return svg_with_title(page, r"^\S+, 2025 : \d+$")
 
@@ -125,7 +131,7 @@ def test_layout_order(server, paheko, page: Page):
         page.get_by_role("button", name="Actualiser").bounding_box(),
         monthly(page).bounding_box(),
         annual(page).bounding_box(),
-        page.get_by_role("table").bounding_box(),
+        monthly_table(page).bounding_box(),
     ]
     ys = [box["y"] for box in boxes]
     assert ys == sorted(ys)
@@ -145,7 +151,7 @@ def test_reading_on_open(server, paheko, page: Page):
     expect(page.get_by_text(READ)).to_be_visible()
     expect(page.get_by_text(READING)).to_have_count(0)
     expect(page.get_by_role("button", name="Actualiser")).to_be_enabled()
-    expect(page.get_by_role("table")).to_be_visible()
+    expect(monthly_table(page)).to_be_visible()
 
 
 # /ui/statut-de-lecture/read
@@ -443,4 +449,5 @@ def test_failed_refresh_keeps_ranking(server, paheko, page: Page):
     expect(page.get_by_text(f"Réponse inattendue de {URL} : code 500.")).to_be_visible()
     expect(title).to_be_visible()
     # Members not in `paheko.members` are named "Prénom NOM", numbered by id.
-    expect(page.get_by_role("cell", name="10 Prénom NOM", exact=True)).to_have_count(1)
+    member = page.get_by_role("rowheader", name="10 Prénom NOM", exact=True)
+    expect(member).to_have_count(1)
