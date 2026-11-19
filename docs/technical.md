@@ -44,8 +44,16 @@
 ## Tests et qualité
 
 - Tests avec pytest ; l'API Paheko y est simulée, jamais appelée.
-- Tests de l'interface dans un navigateur avec Playwright
-  (`pytest-playwright`, Chromium sans affichage).
+- Niveaux de test :
+  - opérations : requêtes HTTP à l'application, sans serveur ; ils
+    observent les réponses, l'état gardé en mémoire et les requêtes
+    reçues par Paheko ;
+  - interface : l'application servie, pilotée dans un navigateur avec
+    Playwright (`pytest-playwright`, Chromium sans affichage) ; ils
+    observent ce que les pages affichent et les fichiers téléchargés ;
+  - scénarios : l'application lancée par sa commande, Paheko simulé
+    par un serveur HTTP, pilotée dans un navigateur ; ils observent ce
+    que voit l'utilisateur, de bout en bout.
 - Vérifications : `uv run pytest`, `uv run ruff check`,
   `uv run ruff format --check`.
 - En fin de phase Tests, `uv run ruff check` et
