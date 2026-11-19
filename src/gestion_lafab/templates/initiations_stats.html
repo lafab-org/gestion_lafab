@@ -75,5 +75,27 @@
 {% else %}
 <p>Aucun doublon.</p>
 {% endif %}
+
+<h2>Initiations par membre</h2>
+{% if by_member %}
+<div class="table-wrap">
+<table class="by-member">
+  <thead>
+    <tr><th>Membre</th>{% for c in categories %}<th>{{ c }}</th>{% endfor %}<th>Total</th></tr>
+  </thead>
+  <tbody>
+    {% for m in by_member %}
+    <tr>
+      <th>{{ m.member.label }}</th>
+      {% for n in m.activities %}<td>{{ n }}</td>
+      {% endfor %}<td class="total">{{ m.total }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p>Aucune initiation.</p>
+{% endif %}
 {% endif %}
 </div>

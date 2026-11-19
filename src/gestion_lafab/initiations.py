@@ -117,6 +117,33 @@ def duplicates(reading: Reading) -> list[Duplicate]:
 
 
 @dataclass(frozen=True)
+class MemberCount:
+    member: Member
+    activities: list[int]  # distinct activities, by category, in CATEGORIES order
+
+    @property
+    def total(self) -> int:
+        return sum(self.activities)
+
+
+def by_member(reading: Reading) -> list[MemberCount]:
+    """Members with at least one initiation, the most distinct activities
+    first."""
+    activities: dict[Member, set[tuple[str, int]]] = defaultdict(set)
+    for i in reading.initiations:
+        if i.member is not None:
+            activities[i.member].add((i.category, i.activity))
+    counts = [
+        MemberCount(
+            member,
+            [sum(1 for c, _ in found if c == category) for category in CATEGORIES],
+        )
+        for member, found in activities.items()
+    ]
+    return sorted(counts, key=lambda c: c.total, reverse=True)
+
+
+@dataclass(frozen=True)
 class MonthRow:
     year: int
     month: int

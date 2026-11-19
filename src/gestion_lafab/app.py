@@ -125,6 +125,7 @@ def create_app(
                 annual_chart=annual,
                 annual_bars=annual_bars,
                 duplicates=initiations.duplicates(reading),
+                by_member=initiations.by_member(reading),
                 labels=reading.labels,
                 paheko_url=current_env().get("PAHEKO_URL", "").rstrip("/"),
             )
