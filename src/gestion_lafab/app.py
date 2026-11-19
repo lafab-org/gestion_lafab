@@ -126,6 +126,7 @@ def create_app(
                 annual_bars=annual_bars,
                 duplicates=initiations.duplicates(reading),
                 labels=reading.labels,
+                paheko_url=current_env().get("PAHEKO_URL", "").rstrip("/"),
             )
         return templates.get_template("initiations_stats.html").render(context)
 

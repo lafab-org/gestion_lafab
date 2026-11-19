@@ -44,6 +44,8 @@
     table.duplicates { width: auto; }
     table.duplicates thead th:nth-child(2) { text-align: left; }
     table.duplicates tbody th { padding-right: 1.5rem; }
+    a.delete { white-space: nowrap; }
+    a.delete .del { width: .9em; height: .9em; display: inline-block; vertical-align: -.1em; margin-right: .3em; fill: var(--error); }
   </style>
 </head>
 <body data-signals="{reading: {{ 'true' if init else 'false' }}}">

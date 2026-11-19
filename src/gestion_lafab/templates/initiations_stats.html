@@ -64,8 +64,9 @@
     <tr>
       <th>{{ d.member.label }}</th>
       <th>{{ labels.get(d.activity, "") }}</th>
-      <td>{{ d.first.strftime("%d/%m/%Y") }}</td>
-      <td>{{ d.second.strftime("%d/%m/%Y") }}</td>
+      {% for i in (d.first, d.second) %}
+      <td><a class="delete" href="{{ paheko_url }}/admin/services/user/delete.php?id={{ i.id }}" target="_blank" rel="noopener" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>{{ i.day.strftime("%d/%m/%Y") }}</a></td>
+      {% endfor %}
     </tr>
     {% endfor %}
   </tbody>

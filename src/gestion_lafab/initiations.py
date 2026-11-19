@@ -27,6 +27,7 @@ class Initiation:
     category: str
     activity: int = 0
     member: Member | None = None
+    id: int = 0  # of the registration in Paheko
 
 
 @dataclass(frozen=True)
@@ -54,7 +55,7 @@ async def read_initiations(
 ) -> ReadResult:
     activities = ", ".join(str(a) for a in sorted(CATEGORY_OF_ACTIVITY))
     query = (
-        "SELECT su.id_user, su.id_service, su.date, s.label,"
+        "SELECT su.id, su.id_user, su.id_service, su.date, s.label,"
         " u.numero, u.prenom, u.nom"
         " FROM services_users su"
         " LEFT JOIN services s ON s.id = su.id_service"
@@ -78,7 +79,9 @@ async def read_initiations(
         user = int(row["id_user"])
         if user not in members:
             members[user] = to_member(row, "id_user")
-        initiations.append(Initiation(day, category, activity, members[user]))
+        initiations.append(
+            Initiation(day, category, activity, members[user], int(row["id"]))
+        )
     return ReadResult(True, reading=Reading(initiations, now, labels))
 
 
@@ -86,8 +89,8 @@ async def read_initiations(
 class Duplicate:
     member: Member
     activity: int
-    first: date
-    second: date
+    first: Initiation
+    second: Initiation
 
 
 def one_year_after(day: date) -> date:
@@ -100,17 +103,17 @@ def one_year_after(day: date) -> date:
 def duplicates(reading: Reading) -> list[Duplicate]:
     """Pairs of initiations of a member to an activity less than a year
     apart, the most recent second first."""
-    days: dict[tuple[Member, int], list[date]] = defaultdict(list)
+    groups: dict[tuple[Member, int], list[Initiation]] = defaultdict(list)
     for i in reading.initiations:
         if i.member is not None:
-            days[(i.member, i.activity)].append(i.day)
+            groups[(i.member, i.activity)].append(i)
     found = [
         Duplicate(member, activity, first, second)
-        for (member, activity), dates in days.items()
-        for first, second in combinations(sorted(dates), 2)
-        if second < one_year_after(first)
+        for (member, activity), group in groups.items()
+        for first, second in combinations(sorted(group, key=lambda i: i.day), 2)
+        if second.day < one_year_after(first.day)
     ]
-    return sorted(found, key=lambda d: (d.second, d.first), reverse=True)
+    return sorted(found, key=lambda d: (d.second.day, d.first.day), reverse=True)
 
 
 @dataclass(frozen=True)
