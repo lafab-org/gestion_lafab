@@ -36,6 +36,8 @@ thead th { color: var(--muted); font-weight: 600; position: sticky; top: 0; back
 tbody th, thead th:first-child { text-align: left; font-weight: 400; }
 td.total { font-weight: 600; }
 table.doublons { width: auto; }
+a.delete { white-space: nowrap; }
+a.delete .del { width: .9em; height: .9em; display: inline-block; vertical-align: -.1em; margin-right: .3em; fill: var(--error); }
 table.doublons tbody th { padding-right: 1.5rem; }
 button { margin: .5rem 0; }
 </style>
@@ -243,9 +245,9 @@ button { margin: .5rem 0; }
 </tbody></table></div>
 <h3>Doublons</h3>
 <div class="tablewrap"><table class="doublons"><thead><tr><th>Membre</th><th>Activité</th><th>Première</th><th>Seconde</th></tr></thead><tbody>
-<tr><th>412 Camille Martin</th><th>Initiation laser</th><td>14/10/2026</td><td>14/10/2026</td></tr>
-<tr><th>87 Sacha Bernard</th><th>Initiation soudage TIG</th><td>03/02/2026</td><td>21/06/2026</td></tr>
-<tr><th>305 Lou Petit</th><th>Initiation couture</th><td>19/11/2025</td><td>05/03/2026</td></tr>
+<tr><th>412 Camille Martin</th><th>Initiation laser</th><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>14/10/2026</a></td><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>14/10/2026</a></td></tr>
+<tr><th>87 Sacha Bernard</th><th>Initiation soudage TIG</th><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>03/02/2026</a></td><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>21/06/2026</a></td></tr>
+<tr><th>305 Lou Petit</th><th>Initiation couture</th><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>19/11/2025</a></td><td><a class="delete" href="#" title="Supprimer cette inscription dans Paheko"><svg class="del" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4v1h3v1.5H3V3h3zM4 5.5h8l-.7 8.5H4.7z"/></svg>05/03/2026</a></td></tr>
 </tbody></table></div>
 </div>
 

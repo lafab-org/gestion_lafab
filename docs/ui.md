@@ -176,13 +176,17 @@ Le titre `Doublons`, puis une ligne par doublon des Doublons
 d'initiation ; les colonnes `Membre`, `Activité`, `Première`,
 `Seconde`.
 
-- [ordre] Les lignes de la `seconde` la plus récente à la plus
-  ancienne ; l'ordre des doublons de même `seconde` est libre.
+- [ordre] Les lignes de la date de `seconde` la plus récente à la plus
+  ancienne ; l'ordre des doublons de même date de `seconde` est libre.
 - [membre] Colonne `Membre` : `<numéro> <nom>` du membre.
 - [activite] Colonne `Activité` : le libellé de l'activité, dans
   `libelles` de la Lecture des initiations ; vide sans libellé lu.
-- [dates] Colonnes `Première` et `Seconde` : `premiere` et `seconde`,
-  `<jj/mm/aaaa>`.
+- [dates] Colonnes `Première` et `Seconde` : la date de `premiere` et
+  de `seconde`, `<jj/mm/aaaa>`.
+- [suppression] Chaque date est un lien vers
+  `<url>/admin/services/user/delete.php?id=<id>`, l'`id` de son
+  initiation, `<url>` le `PAHEKO_URL` configuré, ouvert dans un nouvel
+  onglet.
 - [aucun] Aucun doublon : `Aucun doublon.` à la place des lignes.
 
 ## Page du rapprochement des initiations

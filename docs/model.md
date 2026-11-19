@@ -79,6 +79,7 @@ catégorie :
 Une inscription d'un membre à l'une des activités de la Catégorie
 d'initiation.
 
+- `id` : l'identifiant Paheko de l'inscription.
 - `date` : la date de la séance d'initiation, portée par l'inscription.
 - `membre` : le Membre inscrit.
 - `activite` : son activité.
@@ -115,8 +116,8 @@ Calculés à partir de la Lecture des initiations.
   doublon, chacune avec :
   - `membre` : leur membre ;
   - `activite` : leur activité ;
-  - `premiere`, `seconde` : les dates de la plus ancienne et de la plus
-    récente.
+  - `premiere`, `seconde` : la plus ancienne et la plus récente des
+    deux initiations.
   - [écart] Deux initiations du même membre et de la même activité
     forment un doublon quand la plus récente est datée strictement
     avant le même jour de l'année suivant la plus ancienne ; deux
