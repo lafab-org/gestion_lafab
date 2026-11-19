@@ -126,6 +126,17 @@ Calculés à partir de la Lecture des initiations.
   - [paires] Chaque paire forme son propre doublon, même quand plus de
     deux initiations du même membre à la même activité se suivent.
 
+## Initiations par membre
+
+Calculées à partir de la Lecture des initiations.
+
+- `membres` : chaque membre qui a au moins une de ses initiations,
+  avec :
+  - `activites` : pour chaque catégorie, le nombre d'activités
+    différentes de cette catégorie auxquelles il a au moins une
+    initiation ;
+  - `total` : la somme de `activites`.
+
 ## Membre
 
 Un membre de l'association dans Paheko.

@@ -125,7 +125,9 @@ Affiche, de haut en bas :
 - [stats] les Statistiques des initiations affichées, si une Lecture
   des initiations est en mémoire ;
 - [doublons] le Tableau des doublons d'initiation, si une Lecture des
-  initiations est en mémoire.
+  initiations est en mémoire ;
+- [par-membre] le Tableau des initiations par membre, si une Lecture
+  des initiations est en mémoire.
 
 Actions :
 - [refresh-click] Clic sur `Actualiser` : lance
@@ -188,6 +190,19 @@ d'initiation ; les colonnes `Membre`, `Activité`, `Première`,
   initiation, `<url>` le `PAHEKO_URL` configuré, ouvert dans un nouvel
   onglet.
 - [aucun] Aucun doublon : `Aucun doublon.` à la place des lignes.
+
+## Tableau des initiations par membre
+
+Le titre `Initiations par membre`, puis une ligne par membre des
+Initiations par membre ; une colonne `Membre`, une colonne par
+catégorie, dans l'ordre bois, métal, souple, numérique, puis `Total`.
+
+- [ordre] Les lignes du `total` le plus élevé au plus faible ; l'ordre
+  des membres de même `total` est libre.
+- [membre] Colonne `Membre` : `<numéro> <nom>` du membre.
+- [cells] Chaque colonne de catégorie : `activites` de cette catégorie.
+- [total] Colonne `Total` : `total`.
+- [aucun] Aucun membre : `Aucune initiation.` à la place des lignes.
 
 ## Page du rapprochement des initiations
 
