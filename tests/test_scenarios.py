@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page, expect
 
+from tests.conftest import free_port
 from tests.fakes import (
     API_ID,
     API_TOKEN,
@@ -119,9 +120,9 @@ def write_env(tmp_path: Path, paheko_url: str) -> None:
     )
 
 
-def launch(tmp_path: Path) -> tuple[subprocess.Popen, Path]:
-    """Run `uv run gestion-lafab`; returns the process and where the browser
-    records the opened URL."""
+def launch(tmp_path: Path, port: int | None = None) -> tuple[subprocess.Popen, Path]:
+    """Run `uv run gestion-lafab` on `port`, a free one if None; returns the
+    process and where the browser records the opened URL."""
     opened = tmp_path / "opened-url"
     browser = tmp_path / "record-browser"
     browser.write_text(
@@ -130,6 +131,7 @@ def launch(tmp_path: Path) -> tuple[subprocess.Popen, Path]:
     browser.chmod(0o755)
     env = dict(os.environ, BROWSER=str(browser))
     env = {k: v for k, v in env.items() if not k.startswith("PAHEKO_")}
+    env["PORT"] = str(free_port() if port is None else port)
     process = subprocess.Popen(
         ["uv", "run", "--project", str(REPO), "gestion-lafab"],
         cwd=tmp_path,
@@ -147,10 +149,11 @@ def stop(process: subprocess.Popen) -> None:
 # /scenarios/premier-lancement
 def test_first_launch(tmp_path, paheko_server, page: Page):
     write_env(tmp_path, paheko_server.url)
-    process, opened = launch(tmp_path)
+    port = free_port()
+    process, opened = launch(tmp_path, port)
     try:
         url = wait_for(opened, timeout=30)
-        assert url.startswith("http://127.0.0.1:8000")
+        assert url.startswith(f"http://127.0.0.1:{port}/")
         goto_when_up(page, url)
         connected = f"Connecté à {paheko_server.url}."
         expect(page.get_by_text(connected)).to_be_visible()
