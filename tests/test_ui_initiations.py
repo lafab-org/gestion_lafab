@@ -420,3 +420,27 @@ def test_failed_refresh_keeps_duplicates(server, paheko, page: Page):
     expect(page.get_by_text(f"Réponse inattendue de {URL} : code 500.")).to_be_visible()
     expect(page.get_by_role("heading", name="Doublons", exact=True)).to_be_visible()
     expect(page.get_by_role("row").filter(has_text="02/03/2026")).to_have_count(1)
+
+
+# /ui/page-des-initiations/par-membre
+def test_no_ranking_without_reading(server, paheko, page: Page):
+    paheko.status = 403
+    open_page(page, server)
+    expect(page.get_by_text(f"Identifiants refusés par {URL}.")).to_be_visible()
+    expect(page.get_by_role("heading", name="Initiations par membre")).to_have_count(0)
+    expect(page.get_by_text("Aucune initiation.")).to_have_count(0)
+
+
+# /ui/page-des-initiations/par-membre /ui/statut-de-lecture/failed
+def test_failed_refresh_keeps_ranking(server, paheko, page: Page):
+    paheko.registrations = REGISTRATIONS
+    open_page(page, server)
+    expect(page.get_by_text(READ)).to_be_visible()
+    title = page.get_by_role("heading", name="Initiations par membre", exact=True)
+    expect(title).to_be_visible()
+    paheko.status = 500
+    page.get_by_role("button", name="Actualiser").click()
+    expect(page.get_by_text(f"Réponse inattendue de {URL} : code 500.")).to_be_visible()
+    expect(title).to_be_visible()
+    # Members not in `paheko.members` are named "Prénom NOM", numbered by id.
+    expect(page.get_by_role("cell", name="10 Prénom NOM", exact=True)).to_have_count(1)
