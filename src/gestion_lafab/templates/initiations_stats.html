@@ -51,5 +51,28 @@
   </tbody>
 </table>
 </div>
+
+<h2>Doublons</h2>
+{% if duplicates %}
+<div class="table-wrap">
+<table class="duplicates">
+  <thead>
+    <tr><th>Membre</th><th>Activité</th><th>Première</th><th>Seconde</th></tr>
+  </thead>
+  <tbody>
+    {% for d in duplicates %}
+    <tr>
+      <th>{{ d.member.label }}</th>
+      <th>{{ labels.get(d.activity, "") }}</th>
+      <td>{{ d.first.strftime("%d/%m/%Y") }}</td>
+      <td>{{ d.second.strftime("%d/%m/%Y") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p>Aucun doublon.</p>
+{% endif %}
 {% endif %}
 </div>

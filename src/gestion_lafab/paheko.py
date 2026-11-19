@@ -67,3 +67,28 @@ async def check_connection(
     if result.answered:
         return CheckResult(True, f"Connecté à {env['PAHEKO_URL']}.")
     return CheckResult(False, result.message)
+
+
+@dataclass(frozen=True)
+class Member:
+    """A member of the association in Paheko."""
+
+    id: int
+    numero: str
+    name: str
+
+    @property
+    def label(self) -> str:
+        """`<numéro> <nom>`."""
+        return " ".join(part for part in (self.numero, self.name) if part)
+
+
+def member_name(row: Mapping) -> str:
+    return " ".join(str(row[k]) for k in ("prenom", "nom") if row.get(k)).strip()
+
+
+def to_member(row: Mapping, id_key: str = "id") -> Member:
+    numero = row.get("numero")
+    return Member(
+        int(row[id_key]), "" if numero is None else str(numero), member_name(row)
+    )

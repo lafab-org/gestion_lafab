@@ -41,6 +41,9 @@
     thead th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
     tbody th, thead th:first-child { text-align: left; font-weight: 400; }
     td.total { font-weight: 600; }
+    table.duplicates { width: auto; }
+    table.duplicates thead th:nth-child(2) { text-align: left; }
+    table.duplicates tbody th { padding-right: 1.5rem; }
   </style>
 </head>
 <body data-signals="{reading: {{ 'true' if init else 'false' }}}">

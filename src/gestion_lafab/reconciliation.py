@@ -16,7 +16,7 @@ import httpx
 
 from gestion_lafab.initiations import CATEGORY_OF_ACTIVITY
 from gestion_lafab.membership import MONTHS
-from gestion_lafab.paheko import run_sql
+from gestion_lafab.paheko import Member, run_sql, to_member
 
 UNREADABLE = "Export des tickets illisible."
 CASH_CATEGORY = 5
@@ -74,13 +74,6 @@ def activity_of(label: str) -> int | None:
         if any(word in folded for word in words)
     }
     return found.pop() if len(found) == 1 else None
-
-
-@dataclass(frozen=True)
-class Member:
-    id: int
-    numero: str
-    name: str
 
 
 @dataclass(frozen=True)
@@ -208,17 +201,6 @@ def parse_export(content: bytes) -> list[Ticket] | None:
             )
         )
     return tickets
-
-
-def member_name(row: Mapping) -> str:
-    return " ".join(str(row[k]) for k in ("prenom", "nom") if row.get(k)).strip()
-
-
-def to_member(row: Mapping, id_key: str = "id") -> Member:
-    numero = row.get("numero")
-    return Member(
-        int(row[id_key]), "" if numero is None else str(numero), member_name(row)
-    )
 
 
 def month_bounds(year: int, month: int) -> tuple[str, str]:

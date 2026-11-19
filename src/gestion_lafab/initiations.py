@@ -1,13 +1,15 @@
 """Initiation statistics: Paheko registrations to initiation activities."""
 
+from collections import defaultdict
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
+from itertools import combinations
 
 import httpx
 
 from gestion_lafab.membership import MONTHS
-from gestion_lafab.paheko import run_sql
+from gestion_lafab.paheko import Member, run_sql, to_member
 
 CATEGORIES = ["bois", "métal", "souple", "numérique"]
 # Category of each Paheko activity of initiation, by activity id.
@@ -23,6 +25,8 @@ CATEGORY_OF_ACTIVITY = {
 class Initiation:
     day: date
     category: str
+    activity: int = 0
+    member: Member | None = None
 
 
 @dataclass(frozen=True)
@@ -31,6 +35,7 @@ class Reading:
 
     initiations: list[Initiation]
     instant: datetime
+    labels: dict[int, str] = field(default_factory=dict)  # by activity
 
     @property
     def day(self) -> date:
@@ -49,19 +54,63 @@ async def read_initiations(
 ) -> ReadResult:
     activities = ", ".join(str(a) for a in sorted(CATEGORY_OF_ACTIVITY))
     query = (
-        "SELECT id_service, date FROM services_users"
-        f" WHERE id_service IN ({activities});"
+        "SELECT su.id_user, su.id_service, su.date, s.label,"
+        " u.numero, u.prenom, u.nom"
+        " FROM services_users su"
+        " LEFT JOIN services s ON s.id = su.id_service"
+        " LEFT JOIN users u ON u.id = su.id_user"
+        f" WHERE su.id_service IN ({activities});"
     )
     result = await run_sql(env, transport, query)
     if not result.ok:
         return ReadResult(False, result.message)
     initiations = []
+    labels: dict[int, str] = {}
+    members: dict[int, Member] = {}
     for row in result.rows:
-        category = CATEGORY_OF_ACTIVITY.get(int(row["id_service"]))
+        activity = int(row["id_service"])
+        category = CATEGORY_OF_ACTIVITY.get(activity)
         day = date.fromisoformat(str(row["date"])[:10])
-        if category is not None and day <= now.date():
-            initiations.append(Initiation(day, category))
-    return ReadResult(True, reading=Reading(initiations, now))
+        if category is None or day > now.date():
+            continue
+        if row.get("label"):
+            labels[activity] = str(row["label"])
+        user = int(row["id_user"])
+        if user not in members:
+            members[user] = to_member(row, "id_user")
+        initiations.append(Initiation(day, category, activity, members[user]))
+    return ReadResult(True, reading=Reading(initiations, now, labels))
+
+
+@dataclass(frozen=True)
+class Duplicate:
+    member: Member
+    activity: int
+    first: date
+    second: date
+
+
+def one_year_after(day: date) -> date:
+    try:
+        return day.replace(year=day.year + 1)
+    except ValueError:  # 29 February
+        return date(day.year + 1, 3, 1)
+
+
+def duplicates(reading: Reading) -> list[Duplicate]:
+    """Pairs of initiations of a member to an activity less than a year
+    apart, the most recent second first."""
+    days: dict[tuple[Member, int], list[date]] = defaultdict(list)
+    for i in reading.initiations:
+        if i.member is not None:
+            days[(i.member, i.activity)].append(i.day)
+    found = [
+        Duplicate(member, activity, first, second)
+        for (member, activity), dates in days.items()
+        for first, second in combinations(sorted(dates), 2)
+        if second < one_year_after(first)
+    ]
+    return sorted(found, key=lambda d: (d.second, d.first), reverse=True)
 
 
 @dataclass(frozen=True)

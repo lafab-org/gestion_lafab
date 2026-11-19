@@ -124,6 +124,8 @@ def create_app(
                 monthly_bars=monthly_bars,
                 annual_chart=annual,
                 annual_bars=annual_bars,
+                duplicates=initiations.duplicates(reading),
+                labels=reading.labels,
             )
         return templates.get_template("initiations_stats.html").render(context)
 
